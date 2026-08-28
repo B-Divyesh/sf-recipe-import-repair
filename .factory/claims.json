@@ -11,7 +11,7 @@
     "claim": "Every suggested repair can be undone",
     "where": "landing method, demo toolbar, README",
     "test": "npm test -- --grep @claim:reversible-repairs",
-    "sandbox": "demo data; apply each of the three suggested repairs separately, assert its exact result, undo, and assert its original value"
+    "sandbox": "fresh browser context; apply and undo each demo repair, then apply 31 separate unit repairs and undo all 31 to assert every original line is restored"
   },
   {
     "id": "neutral-export",

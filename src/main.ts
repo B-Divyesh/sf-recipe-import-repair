@@ -37,7 +37,7 @@ const SAMPLE_SOURCE = `{
 }`;
 
 type Route = 'home' | 'demo' | 'privacy' | 'terms' | 'not-found';
-interface Snapshot { recipe: Recipe; label: string }
+interface Snapshot { recipe: Recipe; label: string; repairLogLength: number }
 
 const appRoot = document.querySelector<HTMLDivElement>('#app');
 if (!appRoot) throw new Error('App root is missing.');
@@ -142,8 +142,7 @@ function parseCurrentSource(shouldAnnounce = true): void {
 
 function saveSnapshot(label: string): void {
   if (!recipe) return;
-  editHistory.push({ recipe: cloneRecipe(recipe), label });
-  if (editHistory.length > 30) editHistory.shift();
+  editHistory.push({ recipe: cloneRecipe(recipe), label, repairLogLength: repairLog.length });
 }
 
 function refreshIssues(): void {
@@ -167,7 +166,10 @@ function applyAllRepairs(): void {
   const available = issues.flatMap((item) => item.repair ? [item.repair] : []);
   if (!available.length) return;
   saveSnapshot(`Apply ${available.length} repairs`);
-  available.forEach((item) => item.apply(recipe!));
+  available.forEach((queued) => {
+    const current = inspectRecipe(recipe!).find((item) => item.repair?.id === queued.id)?.repair;
+    current?.apply(recipe!);
+  });
   repairLog.push(...available.map((item) => item.label));
   refreshIssues();
   notice = `${available.length} repairs applied. You can undo them together.`;
@@ -179,8 +181,7 @@ function undoRepair(): void {
   if (!snapshot) return;
   recipe = snapshot.recipe;
   refreshIssues();
-  if (snapshot.label.startsWith('Apply ')) repairLog = [];
-  else repairLog.pop();
+  repairLog = repairLog.slice(0, snapshot.repairLogLength);
   notice = `${snapshot.label} undone.`;
   renderAndFocus('[data-action="apply-all"]:not([disabled]), [data-action="export"]:not([disabled])');
 }

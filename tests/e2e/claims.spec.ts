@@ -27,6 +27,7 @@ Source: https://example.com/lemon-rice
 });
 
 test('@claim:reversible-repairs applies and undoes every suggested repair', async ({ page }) => {
+  test.slow();
   await page.goto('/demo');
   const repairs = [
     { button: 'Convert fraction', field: '#ingredient-0', before: '1½ cups cooked white beans', after: '1 1/2 cups cooked white beans' },
@@ -40,6 +41,52 @@ test('@claim:reversible-repairs applies and undoes every suggested repair', asyn
     await page.getByRole('button', { name: 'Undo last change' }).click();
     await expect(page.locator(repair.field)).toHaveValue(repair.before);
   }
+
+  const ingredientCount = 31;
+  const ingredients = Array.from({ length: ingredientCount }, (_, index) => `1 tablespoons item ${index + 1}`);
+  await page.goto('/');
+  await page.getByLabel('Paste JSON, JSON-LD, or Markdown').fill(JSON.stringify({
+    title: 'History boundary',
+    ingredients,
+    steps: ['Mix.'],
+  }));
+  await page.getByRole('button', { name: 'Inspect recipe' }).click();
+
+  for (let index = 0; index < ingredientCount; index += 1) {
+    await page.getByRole('button', { name: 'Use tbsp' }).first().click();
+  }
+  const ingredientValues = () => page.locator('[data-field^="ingredient-"]').evaluateAll(
+    (fields) => fields.map((field) => (field as HTMLInputElement).value),
+  );
+  expect(await ingredientValues()).toEqual(ingredients.map((line) => line.replace('tablespoons', 'tbsp')));
+
+  for (let index = 0; index < ingredientCount; index += 1) {
+    await page.getByRole('button', { name: 'Undo last change' }).click();
+  }
+  expect(await ingredientValues()).toEqual(ingredients);
+  await expect(page.getByRole('button', { name: 'Undo last change' })).toBeDisabled();
+});
+
+test('Apply N safe repairs composes overlapping changes on the latest ingredient value', async ({ page }) => {
+  await page.goto('/');
+  await page.getByLabel('Paste JSON, JSON-LD, or Markdown').fill(JSON.stringify({
+    title: 'Overlapping repairs',
+    ingredients: ['1½ tablespoons oil'],
+    steps: ['Mix.'],
+  }));
+  await page.getByRole('button', { name: 'Inspect recipe' }).click();
+
+  await expect(page.getByRole('button', { name: 'Apply 2 safe repairs' })).toBeVisible();
+  await page.getByRole('button', { name: 'Apply 2 safe repairs' }).click();
+
+  await expect(page.locator('#ingredient-0')).toHaveValue('1 1/2 tbsp oil');
+  await expect(page.getByText('Ready to export', { exact: true })).toBeVisible();
+  await expect(page.locator('.issue')).toHaveCount(0);
+  await expect(page.locator('.workbench [aria-live="polite"]')).toContainText('2 repairs applied');
+
+  await page.getByRole('button', { name: 'Undo last change' }).click();
+  await expect(page.locator('#ingredient-0')).toHaveValue('1½ tablespoons oil');
+  await expect(page.locator('.issue')).toHaveCount(2);
 });
 
 test('@claim:repair-diagnostics identifies malformed quantities, verbose units, missing data, invalid addresses, and oversized fields', async ({ page }) => {
