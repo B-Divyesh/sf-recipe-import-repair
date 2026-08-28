@@ -14,7 +14,7 @@ Audit date: 2026-08-28. Counts treat hyphenated terms, URLs, and `$0` as one wor
 | The sample opens with three repairable issues. | 7 | Pass |
 | Files stay in this browser | 5 | Pass |
 | Works offline after first visit | 5 | Pass |
-| $0 Free and open source | 5 | Pass |
+| $0 Free — no account needed | 5 | Pass |
 | Inspect the lines. | 3 | Pass |
 | Apply named changes. | 3 | Pass |
 | Keep the source. | 3 | Pass |
@@ -29,7 +29,7 @@ The first screen states the job, the audience, and the first action in one breat
 | Paste JSON, JSON-LD, or Markdown. | 5 | Pass |
 | You see the parsed fields before you export anything. | 9 | Pass |
 | Maximum file size: 2 MB. | 5 | Pass |
-| Web addresses are preserved, never fetched. | 6 | Pass |
+| Web addresses are preserved and never fetched. | 6 | Pass |
 | Your parsed fields will appear here. | 6 | Pass |
 | Paste recipe text or choose a file. | 7 | Pass |
 | Then inspect it. | 3 | Pass |
@@ -44,10 +44,9 @@ The first screen states the job, the audience, and the first action in one breat
 | --- | ---: | --- |
 | Your recipe stays yours | 4 | Pass |
 | The tool does not fetch recipe pages. | 7 | Pass |
-| It does not rewrite your cooking instructions. | 7 | Pass |
-| It does not calculate nutrition. | 5 | Pass |
+| Repairs do not change cooking instructions. | 6 | Pass |
 | No recipe text leaves your device. | 6 | Pass |
-| There are no accounts, trackers, or remote storage. | 8 | Pass |
+| No account is required. | 4 | Pass |
 
 ## Terminology
 

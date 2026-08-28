@@ -103,6 +103,38 @@ test('@claim:free-flow completes without an account or payment', async ({ page }
   await expect(page.getByText(/sign in|buy|payment/i)).toHaveCount(0);
 });
 
+test('@claim:source-url-no-fetch preserves the source URL without requesting it', async ({ page }) => {
+  const requests: string[] = [];
+  page.on('request', (request) => requests.push(request.url()));
+  await page.goto('/demo');
+  await page.getByRole('button', { name: 'Apply 3 safe repairs' }).click();
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export neutral JSON' }).click();
+  const download = await downloadPromise;
+  const stream = await download.createReadStream();
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) chunks.push(Buffer.from(chunk));
+  const bundle = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+  expect(bundle.attribution.sourceUrl).toBe('https://example.com/mara/rosemary-tomato-beans');
+  expect(requests.some((url) => new URL(url).origin === 'https://example.com')).toBe(false);
+});
+
+test('@claim:instructions-unchanged leaves cooking instructions byte-for-byte unchanged', async ({ page }) => {
+  await page.goto('/demo');
+  const before = await page.locator('[data-field^="step-"]').evaluateAll((fields) => fields.map((field) => (field as HTMLTextAreaElement).value));
+  await page.getByRole('button', { name: 'Apply 3 safe repairs' }).click();
+  const after = await page.locator('[data-field^="step-"]').evaluateAll((fields) => fields.map((field) => (field as HTMLTextAreaElement).value));
+  expect(after).toEqual(before);
+});
+
+test('keyboard repair keeps focus on Undo last change after the workbench rerenders', async ({ page }) => {
+  await page.goto('/demo');
+  await page.getByRole('button', { name: 'Apply 3 safe repairs' }).focus();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('button', { name: 'Undo last change' })).toBeFocused();
+  await expect(page.getByText('Ready to export', { exact: true })).toBeVisible();
+});
+
 test('pages meet the automated accessibility baseline', async ({ page }) => {
   for (const path of ['/', '/demo', '/privacy', '/terms', '/missing-page']) {
     await page.goto(path);

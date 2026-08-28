@@ -158,7 +158,7 @@ function applyRepair(id: string): void {
   repairLog.push(selected.label);
   refreshIssues();
   notice = `${selected.label} applied. You can undo it.`;
-  render();
+  renderAndFocus('[data-action="undo"]:not([disabled])');
 }
 
 function applyAllRepairs(): void {
@@ -170,7 +170,7 @@ function applyAllRepairs(): void {
   repairLog.push(...available.map((item) => item.label));
   refreshIssues();
   notice = `${available.length} repairs applied. You can undo them together.`;
-  render();
+  renderAndFocus('[data-action="undo"]:not([disabled])');
 }
 
 function undoRepair(): void {
@@ -181,7 +181,7 @@ function undoRepair(): void {
   if (snapshot.label.startsWith('Apply ')) repairLog = [];
   else repairLog.pop();
   notice = `${snapshot.label} undone.`;
-  render();
+  renderAndFocus('[data-action="apply-all"]:not([disabled]), [data-action="export"]:not([disabled])');
 }
 
 function resetDemo(): void {
@@ -249,7 +249,7 @@ function factList(): string {
   return `<ul class="facts" aria-label="Product facts">
     <li><span aria-hidden="true">⌂</span> Files stay in this browser</li>
     <li><span aria-hidden="true">↯</span> Works offline after first visit</li>
-    <li><span aria-hidden="true">$0</span> Free and open source</li>
+    <li><span aria-hidden="true">$0</span> Free — no account needed</li>
   </ul>`;
 }
 
@@ -288,7 +288,7 @@ function homePage(): string {
     </section>
     <section class="boundaries" aria-labelledby="boundaries-title">
       <div><p class="eyebrow">Bench limits</p><h2 id="boundaries-title">Your recipe stays yours</h2></div>
-      <div><p>The tool does not fetch recipe pages. It does not rewrite your cooking instructions. It does not calculate nutrition.</p><p>No recipe text leaves your device. There are no accounts, trackers, or remote storage.</p></div>
+      <div><p>The tool does not fetch recipe pages. Repairs do not change cooking instructions.</p><p>No recipe text leaves your device. No account is required.</p></div>
     </section>
   </main>`;
 }
@@ -365,7 +365,7 @@ function workbench(expanded: boolean): string {
         <input id="${expanded ? 'demo' : 'bench-home'}-file" class="visually-hidden" type="file" accept=".json,.jsonld,.md,.markdown,text/markdown,application/json" />
         <label class="source-label" for="source-text">Paste JSON, JSON-LD, or Markdown</label>
         <textarea id="source-text" class="source-text" rows="${expanded ? '15' : '10'}" spellcheck="false" placeholder="# Tomato beans&#10;&#10;## Ingredients&#10;- 2 cups beans&#10;&#10;## Steps&#10;1. Warm the beans.">${escapeHtml(source)}</textarea>
-        <p class="input-help">Maximum file size: 2 MB. Web addresses are preserved, never fetched.</p>
+        <p class="input-help">Maximum file size: 2 MB. Web addresses are preserved and never fetched.</p>
         <button class="button primary full-button" data-action="inspect">Inspect recipe</button>
         ${errorMessage ? `<div class="parse-error" role="alert"><strong>Source not read</strong><p>${escapeHtml(errorMessage)}</p></div>` : ''}
         ${showSource && recipe ? `<pre class="raw-source" tabindex="0"><code>${escapeHtml(source)}</code></pre>` : ''}
@@ -379,11 +379,11 @@ function workbench(expanded: boolean): string {
 }
 
 function privacyPage(): string {
-  return `<main id="main" class="prose-page"><p class="eyebrow">Policy note</p><h1>Privacy in plain words</h1><p class="lede">Recipe Import Repair works without an account or a server upload.</p><section><h2>Your recipe files</h2><p>Your browser reads and repairs the text. The site does not send recipe text to us or another service.</p><h2>Browser storage</h2><p>Normal use does not store recipe text. Demo mode stores only its bundled sample in session storage under a <code>demo:</code> key. Closing the tab removes session storage.</p><h2>Network requests</h2><p>The installed app shell can load from a local browser cache. The site has no analytics, advertising, or third-party scripts.</p><h2>Questions</h2><p>Open an issue in the product repository if this policy needs correction.</p></section></main>`;
+  return `<main id="main" class="prose-page"><p class="eyebrow">Policy note</p><h1>Privacy in plain words</h1><p class="lede">Recipe Import Repair works without an account or a server upload.</p><section><h2>Your recipe files</h2><p>Your browser reads and repairs the text. The site does not send recipe text to us or another service.</p><h2>Browser storage</h2><p>Demo mode stores only its bundled sample in session storage under a <code>demo:</code> key. Starting normal work removes that demo key.</p><h2>Network requests</h2><p>The installed app shell can load from a local browser cache. The repair flow makes no third-party requests.</p><h2>Questions</h2><p>Open an issue in the product repository if this policy needs correction.</p></section></main>`;
 }
 
 function termsPage(): string {
-  return `<main id="main" class="prose-page"><p class="eyebrow">Usage note</p><h1>Terms for this free tool</h1><p class="lede">Use Recipe Import Repair to inspect recipe files you have the right to use.</p><section><h2>No recipe collection service</h2><p>This tool does not fetch web pages or provide hosted recipe storage. You choose every file and every repair.</p><h2>Your responsibility</h2><p>Review the exported file before importing it elsewhere. Keep a backup of the original file.</p><h2>No warranty</h2><p>The software is provided under the MIT License without warranty. These terms do not limit rights that local law gives you.</p><h2>Changes</h2><p>Material changes will appear here with a new version date. This version is dated August 28, 2026.</p></section></main>`;
+  return `<main id="main" class="prose-page"><p class="eyebrow">Usage note</p><h1>Terms for this free tool</h1><p class="lede">Use Recipe Import Repair to inspect recipe files you have the right to use.</p><section><h2>No recipe collection service</h2><p>This tool does not fetch web pages. You choose every file and every repair.</p><h2>Your responsibility</h2><p>Review the exported file before importing it elsewhere. Keep a backup of the original file.</p><h2>No warranty</h2><p>The software is provided under the MIT License without warranty. These terms do not limit rights that local law gives you.</p><h2>Changes</h2><p>Material changes will appear here with a new version date. This version is dated August 28, 2026.</p></section></main>`;
 }
 
 function notFoundPage(): string {
@@ -394,6 +394,11 @@ function render(): void {
   updateMeta();
   const content = route === 'home' ? homePage() : route === 'demo' ? demoPage() : route === 'privacy' ? privacyPage() : route === 'terms' ? termsPage() : notFoundPage();
   app.innerHTML = `${header()}${content}${footer()}<div class="route-announcer sr-only" aria-live="polite">${escapeHtml(routeMeta(route).title)}</div>`;
+}
+
+function renderAndFocus(selector: string): void {
+  render();
+  requestAnimationFrame(() => document.querySelector<HTMLElement>(selector)?.focus());
 }
 
 app.addEventListener('click', (event) => {

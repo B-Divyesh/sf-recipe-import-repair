@@ -22,15 +22,15 @@
   },
   {
     "id": "local-only",
-    "claim": "No recipe text leaves your device",
-    "where": "landing facts and privacy section, privacy page, README",
+    "claim": "No recipe text leaves your device and the repair flow makes no third-party requests",
+    "where": "landing facts and privacy page, README",
     "test": "npm test -- --grep @claim:local-only",
     "sandbox": "fresh browser context; record every request during the demo repair flow and assert every URL is same-origin"
   },
   {
     "id": "demo-isolation",
-    "claim": "Demo changes never enter real storage",
-    "where": "demo banner, README",
+    "claim": "Demo source uses a separate demo: session key and never enters real storage",
+    "where": "demo banner, privacy page, README",
     "test": "npm test -- --grep @claim:demo-isolation",
     "sandbox": "fresh browser context; mutate demo, assert localStorage is empty and only a demo-prefixed session key exists, then leave demo and assert it is removed"
   },
@@ -54,5 +54,19 @@
     "where": "landing facts and privacy section, README",
     "test": "npm test -- --grep @claim:free-flow",
     "sandbox": "fresh browser context; repair the demo and reach enabled export with no sign-in, purchase, or payment step"
+  },
+  {
+    "id": "source-url-no-fetch",
+    "claim": "Web addresses are preserved in neutral exports and never fetched",
+    "where": "workbench input note, landing limits, README",
+    "test": "npm test -- --grep @claim:source-url-no-fetch",
+    "sandbox": "fresh browser context; repair and export the demo source URL while recording requests, then assert attribution is retained and no request reaches its URL origin"
+  },
+  {
+    "id": "instructions-unchanged",
+    "claim": "Repairs do not change cooking instructions",
+    "where": "landing limits, README",
+    "test": "npm test -- --grep @claim:instructions-unchanged",
+    "sandbox": "fresh browser context; record every demo instruction, apply all suggested repairs, and assert every instruction is byte-for-byte unchanged"
   }
 ]

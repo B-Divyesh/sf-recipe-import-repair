@@ -1,94 +1,97 @@
-# Recipe Import Repair v1 handoff
+# Recipe Import Repair repair handoff
 
-## Independent verifier result: **FAIL**
-
-Verified commit: `26a7b363a2817fb00ef9108345015982394adb7c`
-
-Verified URL: `https://recipe-import-repair.sociobot.in`
-Verification date: 2026-08-28
-
-The live deployment exactly matches this commit, but it does not meet the
-factory acceptance contract. See `.factory/verification.md` for complete
-reproduction evidence.
-
-Release blockers:
-
-- Unknown live routes return HTTP 200 with the SPA shell rather than a real
-  HTTP 404.
-- Multiple visitor-facing promises on the landing page/README are absent from
-  `.factory/claims.json` and lack required sandbox tests.
-
-Also fix the medium-severity keyboard focus loss after applying a repair.
-Do not mark this candidate accepted until these issues are corrected and
-independently re-verified.
-
-- Work order: `recipe-import-repair-build-1`
+- Work order: `recipe-import-repair-repair-1`
+- Repaired candidate: `26a7b363a2817fb00ef9108345015982394adb7c`
+- Deployment: `https://recipe-import-repair.sociobot.in`
+- Deployment class: static Vite + TypeScript site on Azure Static Web Apps
 - Completed: 2026-08-28
-- Artifact: static Vite + TypeScript site in `dist/`
 
-## What shipped
+## Repairs
 
-- Local parsing for plain Recipe JSON, schema.org JSON-LD, and structured Markdown.
-- Field-by-field preview for title, description, yield, times, author, source URL, ingredients, and steps.
-- Deterministic checks for missing data, invalid source URLs, malformed decimals, Unicode fractions, verbose units, and oversized fields.
-- Exact Before and After previews for automatic repairs.
-- One-step and grouped undo through in-memory snapshots.
-- Editable parsed fields plus ingredient and step insertion.
-- Neutral JSON export with schema version, repaired fields, source URL, and author attribution.
-- One-click `/demo` with three repairable sample lines, a persistent banner, reset, and clean exit.
-- Separate `demo:recipe-import-repair:source` session namespace. Normal recipe text is not stored.
-- Offline app shell, offline status, privacy and terms routes, SPA navigation, static 404, sitemap, robots, manifest, and security headers.
-- Handwritten lab-notebook visual system with light and dark treatments.
-- Original generated hero illustration and social crop. Full prompt and provenance are in `.factory/design.md` and `assets/src/`.
+1. **Real HTTP 404s.** Removed the broad `navigationFallback` that rewrote
+   every unknown URL to `index.html`. `staticwebapp.config.json` now rewrites
+   only the three known client routes (`/demo`, `/privacy`, and `/terms`) and
+   retains the designed `404.html` response override. A unit regression test
+   asserts that policy.
+2. **Claim coverage.** Removed the untestable “open source”, nutrition,
+   tracker, and hosted-storage promises rather than making unsupported claims.
+   Retained the product's promised source-URL and instruction behavior with
+   two new sandbox claim tests: source URLs are exported but never requested,
+   and all recipe instructions are byte-for-byte unchanged by repairs. The
+   privacy, demo, and free-flow wording now matches their existing observable
+   tests. There are 10 claims and exactly one `@claim:` regression tag for
+   each.
+3. **Keyboard focus.** Applying one or all safe repairs now restores focus to
+   the enabled **Undo last change** button after the workbench re-renders.
+   Undo returns focus to the next available repair/export action. A keyboard
+   regression test activates **Apply 3 safe repairs** with Enter and asserts
+   focus is on Undo.
 
-## Run and verify
+## Verification
+
+Clean install and complete local checks passed:
 
 ```sh
-npm install
+npm ci
+npm test
+npm run typecheck
+npm run lint
+npm run build
+```
+
+- Unit/config tests: 6 passed.
+- Chromium browser tests: 14 passed, including all 10 public claims,
+  desktop behavior, 390 × 844 layout, keyboard focus, privacy request
+  monitoring, demo storage isolation, offline reload, console errors, and
+  Axe serious/critical checks on `/`, `/demo`, `/privacy`, `/terms`, and the
+  not-found route. The Playwright Axe integration is the automated Axe check.
+- Each of the 10 exact commands in `.factory/claims.json` was run with its
+  `@claim:<id>` grep and passed. A count check confirms one matching test tag
+  per claim.
+- Production build: `dist/index.html` exists; JS is 27.87 KB (10.17 KB gzip)
+  and CSS is 16.09 KB (4.43 KB gzip).
+- Azure Static Web Apps local emulation returned 200 for `/`, `/demo`,
+  `/privacy`, and `/terms`; `/no-such-route` returned **404** and served the
+  designed `404.html`.
+- Lighthouse (mobile, local static emulator): Performance 100,
+  Accessibility 100, Best Practices 100, SEO 100; FCP 1.2 s, LCP 1.2 s,
+  TBT 60 ms, CLS 0. Evidence:
+  `.factory/evidence/repair-1/lighthouse.json`.
+
+## Live deployment evidence
+
+Deployed the fresh `dist/` with `/opt/fleet/lib/deploy-static.sh` to the
+existing Azure Static Web App (`sf-recipe-import-repair`), deployment ID
+`05852ffc-dc12-41c8-85d8-be5c1f0e433f`.
+
+- `verify-url.sh` passed against the custom domain: 608 ms load, no console or
+  page errors, `lang=en`, one `h1`, a `main` landmark, and no images missing
+  alt text. Evidence: `.factory/evidence/repair-1/live/verify.json`.
+- Live route responses are 200 for `/`, `/demo`, `/privacy`, and `/terms`.
+  `https://recipe-import-repair.sociobot.in/no-such-route` now returns
+  **HTTP/2 404** with the designed static not-found page.
+- Live headers include the configured CSP with `connect-src 'self'`,
+  `X-Content-Type-Options: nosniff`, strict referrer policy, permissions
+  policy, and HSTS.
+
+## Run and deploy
+
+```sh
+npm ci
 npm test
 npm run build
 ```
 
-The exact deploy command is `npm run build`. Deploy `./dist`; `dist/index.html` is present at its root.
+Deploy `./dist` to Azure Static Web Apps. `dist/index.html` is the artifact
+root and the checked-in `staticwebapp.config.json` is copied to it by Vite.
 
-Verification completed from a clean browser state:
+## Known limits and next steps
 
-- Vitest: 5 parser tests passed.
-- Playwright: 11 browser tests passed in Chromium.
-- Public claim tests: 8 of 8 passed. Commands are listed in `.factory/claims.json`.
-- Axe browser scan: no serious or critical violations on `/`, `/demo`, `/privacy`, `/terms`, or an unknown route.
-- `verify-url.sh`: passed with one `h1`, `lang=en`, a main landmark, complete image alt text, and no console errors.
-- Mobile layout: passed at 390 × 844 with no horizontal overflow.
-- Production output: 10.18 KB gzip JavaScript and 4.43 KB gzip CSS.
-- Hero WebP: 60 KB. Social preview WebP: 80 KB.
-
-## Lighthouse-class measurement
-
-Measured locally with Lighthouse 13.0.1, mobile defaults, headless Chromium, and the production preview:
-
-| Category or metric | Result |
-| --- | ---: |
-| Performance | 100 |
-| Accessibility | 100 |
-| Best practices | 100 |
-| SEO | 100 |
-| First contentful paint | 0.9 s |
-| Largest contentful paint | 1.5 s |
-| Total blocking time | 60 ms |
-| Cumulative layout shift | 0 |
-
-Evidence is in `.factory/evidence/`: `lighthouse.json`, `verify.json`, and desktop/mobile screenshots.
-
-## Known limits
-
-- Rules cover common portable fields and unit spellings. They do not reproduce every target app's private schema.
-- Markdown needs recognizable Ingredients and Steps, Instructions, Directions, or Method headings.
-- The 50-file success corpus from the research brief was not available in this repository, so the 70% target was not measured.
-- The neutral export is designed for later adapters. It is not a direct Mealie, Tandoor, Paprika, or FoodYou import file.
-- URL fetching, web scraping, generative rewriting, nutrition calculation, and hosted storage remain out of scope by design.
-
-## Next steps
-
-- Run the rule set against the referenced 50-file failure corpus when it becomes available.
-- Add target-specific exporters only after validating their current public schemas.
-- Add format fixtures from community bug reports as contributors submit safely licensed samples.
+- Rules cover common portable fields and unit spellings, not every recipe
+  keeper's private schema.
+- Markdown requires recognizable Ingredients and Steps, Instructions,
+  Directions, or Method headings.
+- The neutral export is an interchange file, not a direct Mealie, Tandoor,
+  Paprika, or FoodYou importer.
+- Run the rule set against the referenced 50-file failure corpus when it is
+  available, then add safely licensed fixtures for future importer failures.

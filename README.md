@@ -8,7 +8,7 @@ Recipe text stays in the browser. The app works offline after the first visit. T
 
 ## Try the isolated demo
 
-Open `/demo` or [the deployed demo](https://recipe-import-repair.sociobot.in/demo). It loads “Rosemary tomato beans” with three repairable lines. Demo source uses a `demo:` session storage key and never enters real storage. Use **Reset demo** for a clean sample.
+Open `/demo` or [the deployed demo](https://recipe-import-repair.sociobot.in/demo). It loads “Rosemary tomato beans” with three repairable lines. Demo source uses a separate `demo:` session storage key and never enters real storage. Use **Reset demo** for a clean sample.
 
 ## Run locally
 
@@ -42,7 +42,7 @@ npm test -- --grep @claim:neutral-export
 - JSON-LD `Recipe` objects, including recipes inside `@graph`
 - Markdown with a title, Ingredients section, and Steps, Instructions, Directions, or Method section
 
-The tool never fetches a recipe URL. It does not scrape websites, rewrite instructions, calculate nutrition, or store a hosted recipe library.
+The tool never fetches a recipe URL or changes cooking instructions.
 
 ## Neutral export shape
 
