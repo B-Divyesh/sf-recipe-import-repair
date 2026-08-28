@@ -203,10 +203,32 @@ function updateRecipeField(field: string, value: string): void {
   } else if (field.startsWith('step-')) {
     const index = Number(field.slice('step-'.length));
     recipe.steps[index] = value;
+  } else if (field === 'title') {
+    recipe.title = value.trim();
   } else if (field in recipe && typeof recipe[field as keyof Recipe] === 'string') {
     (recipe as unknown as Record<string, string>)[field] = value;
   }
   refreshIssues();
+}
+
+function removeIngredient(index: number): void {
+  if (!recipe || index < 0 || index >= recipe.ingredients.length) return;
+  saveSnapshot(`Remove ingredient ${index + 1}`);
+  recipe.ingredients.splice(index, 1);
+  refreshIssues();
+  notice = `Ingredient ${index + 1} removed. You can undo it.`;
+  const nextIndex = Math.min(index, recipe.ingredients.length - 1);
+  renderAndFocus(nextIndex >= 0 ? `#ingredient-${nextIndex}` : '[data-action="add-ingredient"]');
+}
+
+function removeStep(index: number): void {
+  if (!recipe || index < 0 || index >= recipe.steps.length) return;
+  saveSnapshot(`Remove step ${index + 1}`);
+  recipe.steps.splice(index, 1);
+  refreshIssues();
+  notice = `Step ${index + 1} removed. You can undo it.`;
+  const nextIndex = Math.min(index, recipe.steps.length - 1);
+  renderAndFocus(nextIndex >= 0 ? `#step-${nextIndex}` : '[data-action="add-step"]');
 }
 
 function exportRecipe(): void {
@@ -337,11 +359,11 @@ function editor(): string {
       <label class="field full"><span>Source URL ${fieldStatus('sourceUrl')}</span><input type="url" data-field="sourceUrl" value="${escapeHtml(recipe.sourceUrl)}" /></label>
     </div>
     <fieldset class="line-group"><legend>Ingredients <span>${recipe.ingredients.length} lines</span></legend>
-      ${recipe.ingredients.map((item, index) => `<label class="line-field" for="ingredient-${index}"><span>${index + 1}</span><input id="ingredient-${index}" data-field="ingredient-${index}" value="${escapeHtml(item.raw)}" aria-describedby="ingredient-${index}-state" /><span id="ingredient-${index}-state">${fieldStatus(`ingredient-${index}`)}</span></label>`).join('')}
+      ${recipe.ingredients.map((item, index) => `<div class="line-field"><label for="ingredient-${index}"><span aria-hidden="true">${index + 1}</span><span class="sr-only">Ingredient ${index + 1}</span></label><input id="ingredient-${index}" data-field="ingredient-${index}" value="${escapeHtml(item.raw)}" aria-describedby="ingredient-${index}-state" /><div class="line-controls"><span id="ingredient-${index}-state">${fieldStatus(`ingredient-${index}`)}</span><button class="text-button remove-line" data-action="remove-ingredient" data-index="${index}" aria-label="Remove ingredient ${index + 1}">Remove</button></div></div>`).join('')}
       <button class="text-button add-line" data-action="add-ingredient">+ Add ingredient</button>
     </fieldset>
     <fieldset class="line-group"><legend>Steps <span>${recipe.steps.length} lines</span></legend>
-      ${recipe.steps.map((step, index) => `<label class="line-field step-field" for="step-${index}"><span>${index + 1}</span><textarea id="step-${index}" data-field="step-${index}" rows="2" aria-describedby="step-${index}-state">${escapeHtml(step)}</textarea><span id="step-${index}-state">${fieldStatus(`step-${index}`)}</span></label>`).join('')}
+      ${recipe.steps.map((step, index) => `<div class="line-field step-field"><label for="step-${index}"><span aria-hidden="true">${index + 1}</span><span class="sr-only">Step ${index + 1}</span></label><textarea id="step-${index}" data-field="step-${index}" rows="2" aria-describedby="step-${index}-state">${escapeHtml(step)}</textarea><div class="line-controls"><span id="step-${index}-state">${fieldStatus(`step-${index}`)}</span><button class="text-button remove-line" data-action="remove-step" data-index="${index}" aria-label="Remove step ${index + 1}">Remove</button></div></div>`).join('')}
       <button class="text-button add-line" data-action="add-step">+ Add step</button>
     </fieldset>
   </div>`;
@@ -453,7 +475,9 @@ app.addEventListener('click', (event) => {
   else if (action === 'reset-demo') { resetDemo(); notice = 'Demo reset to the original sample.'; render(); }
   else if (action === 'clear') {
     source = ''; recipe = null; format = null; issues = []; errorMessage = ''; editHistory = []; repairLog = []; notice = 'Bench cleared.'; render();
-  } else if (action === 'add-ingredient' && recipe) {
+  } else if (action === 'remove-ingredient') removeIngredient(Number(button.dataset.index));
+  else if (action === 'remove-step') removeStep(Number(button.dataset.index));
+  else if (action === 'add-ingredient' && recipe) {
     saveSnapshot('Add ingredient');
     recipe.ingredients.push(parseIngredient('', recipe.ingredients.length));
     refreshIssues(); render();

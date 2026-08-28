@@ -227,7 +227,7 @@ function issue(id: string, severity: Severity, field: string, message: string, n
 
 export function inspectRecipe(recipe: Recipe): Issue[] {
   const issues: Issue[] = [];
-  if (!recipe.title) issues.push(issue('missing-title', 'error', 'title', 'The recipe has no title.', 'Enter a title before export.'));
+  if (!recipe.title.trim()) issues.push(issue('missing-title', 'error', 'title', 'The recipe has no title.', 'Enter a title before export.'));
   if (recipe.title.length > 120) issues.push(issue('long-title', 'warning', 'title', `The title has ${recipe.title.length} characters.`, 'Shorten it to 120 characters or fewer.'));
   if (!recipe.ingredients.length) issues.push(issue('missing-ingredients', 'error', 'ingredients', 'No ingredients were found.', 'Add at least one ingredient.'));
   if (!recipe.steps.length) issues.push(issue('missing-steps', 'error', 'steps', 'No steps were found.', 'Add at least one step.'));
@@ -242,6 +242,10 @@ export function inspectRecipe(recipe: Recipe): Issue[] {
 
   recipe.ingredients.forEach((ingredient, index) => {
     const field = `ingredient-${index}`;
+    if (!ingredient.raw.trim()) {
+      issues.push(issue(`empty-${field}`, 'error', field, `Ingredient ${index + 1} is empty.`, 'Write the ingredient or remove this line.'));
+      return;
+    }
     if (ingredient.raw.length > 220) issues.push(issue(`long-${field}`, 'warning', field, `Ingredient ${index + 1} has ${ingredient.raw.length} characters.`, 'Shorten it to 220 characters or fewer.'));
     if (/^\d+\.\.\d+/.test(ingredient.raw)) {
       const decimalFixed = ingredient.raw.replace(/^(\d+)\.\.(\d+)/, '$1.$2');

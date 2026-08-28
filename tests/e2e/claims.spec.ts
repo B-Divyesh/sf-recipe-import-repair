@@ -61,6 +61,32 @@ test('@claim:repair-diagnostics identifies malformed quantities, verbose units, 
   await expect(page.getByText('The title has 121 characters.')).toBeVisible();
   await expect(page.getByText('Ingredient 1 has 221 characters.')).toBeVisible();
   await expect(page.getByText('Step 1 has 1001 characters.')).toBeVisible();
+
+  await inspect(JSON.stringify({ title: 'Valid recipe', ingredients: ['1 cup rice'], steps: ['Cook the rice.'] }));
+  await page.getByLabel(/Title/).fill('   ');
+  await page.getByLabel(/Title/).press('Tab');
+  await page.locator('#ingredient-0').fill('');
+  await page.locator('#ingredient-0').press('Tab');
+  await expect(page.getByLabel(/Title/)).toHaveValue('');
+  await expect(page.getByText('The recipe has no title.')).toBeVisible();
+  await expect(page.getByText('Ingredient 1 is empty.')).toBeVisible();
+  await expect(page.locator('#ingredient-0-state')).toContainText('Fix needed');
+  await expect(page.getByRole('button', { name: 'Export neutral JSON' })).toBeDisabled();
+  await page.getByRole('button', { name: 'Remove ingredient 1' }).click();
+  await expect(page.locator('#ingredient-0')).toHaveCount(0);
+  await expect(page.getByText('No ingredients were found.')).toBeVisible();
+});
+
+test('ingredients and steps have deliberate, reversible remove controls', async ({ page }) => {
+  await page.goto('/demo');
+  await page.getByRole('button', { name: 'Remove ingredient 1' }).click();
+  await expect(page.locator('[data-field^="ingredient-"]')).toHaveCount(5);
+  await page.getByRole('button', { name: 'Undo last change' }).click();
+  await expect(page.locator('[data-field^="ingredient-"]')).toHaveCount(6);
+  await page.getByRole('button', { name: 'Remove step 1' }).click();
+  await expect(page.locator('[data-field^="step-"]')).toHaveCount(2);
+  await page.getByRole('button', { name: 'Undo last change' }).click();
+  await expect(page.locator('[data-field^="step-"]')).toHaveCount(3);
 });
 
 test('@claim:exact-change-preview shows before and after for every suggested repair', async ({ page }) => {
@@ -227,7 +253,7 @@ test('mobile layout has no horizontal overflow', async ({ page }) => {
 test('mobile interactive targets meet the 44 px baseline', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/demo');
-  const selectors = ['.wordmark', '.demo-strip a', '.demo-strip button', 'summary', '.site-footer nav a'];
+  const selectors = ['.wordmark', '.site-header nav a', '.demo-strip a', '.demo-strip button', 'summary', '.remove-line', '.site-footer nav a'];
   for (const selector of selectors) {
     for (const target of await page.locator(selector).all()) {
       const box = await target.boundingBox();
@@ -235,6 +261,15 @@ test('mobile interactive targets meet the 44 px baseline', async ({ page }) => {
       expect(Math.min(box!.width, box!.height), `${selector} should be at least 44 px in both dimensions`).toBeGreaterThanOrEqual(44);
     }
   }
+});
+
+test('mobile 200 percent text size hides the decorative margin note without overlap', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.evaluate(() => { document.documentElement.style.fontSize = '32px'; });
+  await expect(page.locator('.margin-note')).toBeHidden();
+  const sizes = await page.evaluate(() => ({ body: document.body.scrollWidth, viewport: document.documentElement.clientWidth }));
+  expect(sizes.body).toBeLessThanOrEqual(sizes.viewport);
 });
 
 test('primary routes load without console errors', async ({ page }) => {

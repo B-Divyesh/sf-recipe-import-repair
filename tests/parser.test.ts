@@ -60,4 +60,16 @@ Author: Mara Vale
     expect(inspectRecipe(result.recipe).some((item) => item.id === 'bad-source')).toBe(true);
     expect(canExport(result.recipe)).toBe(false);
   });
+
+  it('blocks whitespace-only titles and empty ingredient records', () => {
+    const result = parseRecipe(JSON.stringify({
+      title: 'Valid recipe', ingredients: ['1 cup rice'], steps: ['Cook.'],
+    }));
+    result.recipe.title = '   ';
+    result.recipe.ingredients[0] = { id: 'ingredient-1', raw: '', quantity: '', unit: '', item: '' };
+    const diagnostics = inspectRecipe(result.recipe);
+    expect(diagnostics.map((item) => item.id)).toContain('missing-title');
+    expect(diagnostics.map((item) => item.id)).toContain('empty-ingredient-0');
+    expect(canExport(result.recipe)).toBe(false);
+  });
 });

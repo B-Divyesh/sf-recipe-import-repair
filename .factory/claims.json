@@ -74,7 +74,7 @@
     "claim": "Points to malformed quantities, verbose units, missing data, invalid source addresses, and oversized fields",
     "where": "README",
     "test": "npm test -- --grep @claim:repair-diagnostics",
-    "sandbox": "fresh browser context; inspect deterministic demo and JSON fixtures and assert each named diagnostic message"
+    "sandbox": "fresh browser context; inspect deterministic demo and JSON fixtures, then blank an edited title and ingredient to assert named diagnostics and disabled export"
   },
   {
     "id": "exact-change-preview",
