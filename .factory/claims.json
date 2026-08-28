@@ -1,0 +1,58 @@
+[
+  {
+    "id": "format-import",
+    "claim": "Reads Recipe JSON, JSON-LD, and Markdown into editable fields",
+    "where": "landing workbench, README",
+    "test": "npm test -- --grep @claim:format-import",
+    "sandbox": "fresh browser context; paste the shipped Markdown fixture and assert parsed title, source, and format"
+  },
+  {
+    "id": "reversible-repairs",
+    "claim": "Every suggested repair can be undone",
+    "where": "landing method, demo toolbar, README",
+    "test": "npm test -- --grep @claim:reversible-repairs",
+    "sandbox": "demo data; apply the fraction repair, assert the exact result, undo, and assert the original"
+  },
+  {
+    "id": "neutral-export",
+    "claim": "Exports neutral JSON and preserves source attribution",
+    "where": "landing method, export toolbar, README",
+    "test": "npm test -- --grep @claim:neutral-export",
+    "sandbox": "demo data; apply all safe repairs, download JSON, and assert schema, repaired ingredient, source URL, and author"
+  },
+  {
+    "id": "local-only",
+    "claim": "No recipe text leaves your device",
+    "where": "landing facts and privacy section, privacy page, README",
+    "test": "npm test -- --grep @claim:local-only",
+    "sandbox": "fresh browser context; record every request during the demo repair flow and assert every URL is same-origin"
+  },
+  {
+    "id": "demo-isolation",
+    "claim": "Demo changes never enter real storage",
+    "where": "demo banner, README",
+    "test": "npm test -- --grep @claim:demo-isolation",
+    "sandbox": "fresh browser context; mutate demo, assert localStorage is empty and only a demo-prefixed session key exists, then leave demo and assert it is removed"
+  },
+  {
+    "id": "offline-reload",
+    "claim": "Works offline after the first visit",
+    "where": "landing facts, README",
+    "test": "npm test -- --grep @claim:offline-reload",
+    "sandbox": "fresh browser context; load demo, wait for service worker control, switch the browser offline, reload, and assert the sample bench is available"
+  },
+  {
+    "id": "file-limit",
+    "claim": "Rejects recipe files larger than 2 MB",
+    "where": "workbench input note",
+    "test": "npm test -- --grep @claim:file-limit",
+    "sandbox": "fresh browser context; choose a generated 2 MB plus one byte fixture and assert the size error"
+  },
+  {
+    "id": "free-flow",
+    "claim": "The full repair and export flow is free and needs no account",
+    "where": "landing facts and privacy section, README",
+    "test": "npm test -- --grep @claim:free-flow",
+    "sandbox": "fresh browser context; repair the demo and reach enabled export with no sign-in, purchase, or payment step"
+  }
+]

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://recipe-import-repair.sociobot.in/sitemap.xml

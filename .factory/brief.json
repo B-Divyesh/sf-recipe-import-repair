@@ -1,0 +1,11 @@
+{
+  "slug": "recipe-import-repair",
+  "title": "Recipe Import Repair",
+  "summary": "Fix broken recipe imports before saving them to your recipe keeper.",
+  "territory": "utilities",
+  "user": "A self-hosted recipe keeper moving recipes between formats who needs a deterministic way to inspect and repair broken ingredient and step imports before committing them.",
+  "artifact_class": "static-web",
+  "monetization": "free",
+  "constraints": "Process files in-browser; preserve attribution and source URLs; do not fetch recipe pages; make every transformation reversible.",
+  "state": "BUILT"
+}
