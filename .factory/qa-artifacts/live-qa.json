@@ -1,0 +1,268 @@
+{
+  "base": "https://recipe-import-repair.sociobot.in",
+  "checkedAt": "2026-08-28T22:07:40.815Z",
+  "firstRead": {
+    "status": "complete",
+    "title": "Recipe Import Repair — fix recipe files locally",
+    "h1": "Fix broken recipe imports before saving",
+    "lede": "For self-hosted recipe keepers who need clear fixes before an import changes their collection.",
+    "primary": "Try it with sample data",
+    "primaryHref": "/demo",
+    "actionNote": "The sample opens with three repairable issues.",
+    "httpStatus": 200,
+    "consoleErrors": [],
+    "failedRequests": []
+  },
+  "demoFlow": {
+    "issueCountBefore": 3,
+    "previews": [
+      "See exact change\nBefore\n1½ cups cooked white beans\nAfter\n1 1/2 cups cooked white beans",
+      "See exact change\nBefore\n2..5 tablespoons olive oil\nAfter\n2.5 tbsp olive oil",
+      "See exact change\nBefore\n3 teaspoons tomato paste\nAfter\n3 tsp tomato paste"
+    ],
+    "readyAfterRepair": true,
+    "instructionsUnchanged": true,
+    "export": {
+      "suggestedFilename": "rosemary-tomato-beans-neutral.json",
+      "schemaVersion": "1.0",
+      "title": "Rosemary tomato beans",
+      "attribution": {
+        "sourceUrl": "https://example.com/mara/rosemary-tomato-beans",
+        "author": "Mara Vale"
+      },
+      "firstIngredient": "1 1/2 cups cooked white beans"
+    },
+    "storage": {
+      "local": [],
+      "session": [
+        "demo:recipe-import-repair:source"
+      ]
+    },
+    "undoRestoredThreeIssues": true,
+    "resetRestoredSample": true,
+    "startForReal": {
+      "path": "/",
+      "emptySource": true,
+      "storage": {
+        "local": [],
+        "session": []
+      }
+    }
+  },
+  "privacy": {
+    "requests": [
+      "https://recipe-import-repair.sociobot.in/demo",
+      "https://recipe-import-repair.sociobot.in/assets/index-DYA6zDvh.js",
+      "https://recipe-import-repair.sociobot.in/assets/index-BS1iJ6P3.css",
+      "https://recipe-import-repair.sociobot.in/assets/repair-workbench.webp"
+    ],
+    "allSameOrigin": true,
+    "consoleErrors": [],
+    "responseHeaders": {
+      "/demo": {
+        "status": 200,
+        "cacheControl": "public, must-revalidate, max-age=30",
+        "contentSecurityPolicy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+        "referrerPolicy": "strict-origin-when-cross-origin",
+        "strictTransportSecurity": "max-age=10886400; includeSubDomains; preload",
+        "xContentTypeOptions": "nosniff",
+        "permissionsPolicy": "camera=(), microphone=(), geolocation=()"
+      },
+      "/assets/index-BS1iJ6P3.css": {
+        "status": 200,
+        "cacheControl": "public, max-age=31536000, immutable",
+        "contentSecurityPolicy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+        "referrerPolicy": "strict-origin-when-cross-origin",
+        "strictTransportSecurity": "max-age=10886400; includeSubDomains; preload",
+        "xContentTypeOptions": "nosniff",
+        "permissionsPolicy": "camera=(), microphone=(), geolocation=()"
+      },
+      "/assets/index-DYA6zDvh.js": {
+        "status": 200,
+        "cacheControl": "public, max-age=31536000, immutable",
+        "contentSecurityPolicy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+        "referrerPolicy": "strict-origin-when-cross-origin",
+        "strictTransportSecurity": "max-age=10886400; includeSubDomains; preload",
+        "xContentTypeOptions": "nosniff",
+        "permissionsPolicy": "camera=(), microphone=(), geolocation=()"
+      },
+      "/assets/repair-workbench.webp": {
+        "status": 200,
+        "cacheControl": "public, must-revalidate, max-age=30",
+        "contentSecurityPolicy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+        "referrerPolicy": "strict-origin-when-cross-origin",
+        "strictTransportSecurity": null,
+        "xContentTypeOptions": "nosniff",
+        "permissionsPolicy": "camera=(), microphone=(), geolocation=()"
+      }
+    }
+  },
+  "invalidAndBoundaries": {
+    "emptyError": "Source not read\n\nNothing was added. Paste recipe text or choose a file first.",
+    "malformedError": "Source not read\n\nThe JSON could not be read. Fix the marked punctuation and try again.",
+    "recovery": {
+      "title": "Recovery soup",
+      "author": "Jo Example",
+      "exportEnabled": true
+    },
+    "exactBoundaryIssues": 0,
+    "overBoundaryMessages": [
+      "?\n\nReview: The title has 121 characters.\n\nShorten it to 120 characters or fewer.\n\nEdit this field",
+      "?\n\nReview: Ingredient 1 has 221 characters.\n\nShorten it to 220 characters or fewer.\n\nEdit this field",
+      "?\n\nReview: Step 1 has 1001 characters.\n\nSplit it into shorter steps.\n\nEdit this field"
+    ],
+    "invalidSourceBlocked": true,
+    "editedBlank": {
+      "messages": [
+        "!\n\nFix: The recipe has no title.\n\nEnter a title before export.\n\nEdit this field",
+        "!\n\nFix: Ingredient 1 is empty.\n\nWrite the ingredient or remove this line.\n\nEdit this field"
+      ],
+      "exportDisabled": true
+    }
+  },
+  "overlappingRepairs": {
+    "before": [
+      "?\n\nReview: Ingredient 1 uses a Unicode fraction.\n\nConvert it to a portable slash fraction.\n\nSee exact change\nConvert fraction",
+      "?\n\nReview: Ingredient 1 uses “tablespoons”.\n\nChange the unit to “tbsp”.\n\nSee exact change\nUse tbsp"
+    ],
+    "applyLabel": "Apply 2 safe repairs",
+    "ingredientAfter": "1½ tbsp oil",
+    "issuesAfter": [
+      "?\n\nReview: Ingredient 1 uses a Unicode fraction.\n\nConvert it to a portable slash fraction.\n\nSee exact change\nConvert fraction"
+    ],
+    "readyAfter": false
+  },
+  "undoBoundary": {
+    "appliedCount": 31,
+    "availableUndoCount": 30,
+    "remainingRepairedLines": 1
+  },
+  "routesAndAxe": [
+    {
+      "colorScheme": "light",
+      "path": "/",
+      "status": 200,
+      "title": "Recipe Import Repair — fix recipe files locally",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "seriousCritical": []
+    },
+    {
+      "colorScheme": "light",
+      "path": "/demo",
+      "status": 200,
+      "title": "Demo — Recipe Import Repair",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "seriousCritical": []
+    },
+    {
+      "colorScheme": "light",
+      "path": "/privacy",
+      "status": 200,
+      "title": "Privacy — Recipe Import Repair",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "seriousCritical": []
+    },
+    {
+      "colorScheme": "light",
+      "path": "/terms",
+      "status": 200,
+      "title": "Terms — Recipe Import Repair",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "seriousCritical": []
+    },
+    {
+      "colorScheme": "light",
+      "path": "/missing-verification-route",
+      "status": 404,
+      "title": "Page not found — Recipe Import Repair",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "seriousCritical": []
+    },
+    {
+      "colorScheme": "dark",
+      "path": "/",
+      "status": 200,
+      "title": "Recipe Import Repair — fix recipe files locally",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "seriousCritical": []
+    },
+    {
+      "colorScheme": "dark",
+      "path": "/demo",
+      "status": 200,
+      "title": "Demo — Recipe Import Repair",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "seriousCritical": []
+    },
+    {
+      "colorScheme": "dark",
+      "path": "/privacy",
+      "status": 200,
+      "title": "Privacy — Recipe Import Repair",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "seriousCritical": []
+    },
+    {
+      "colorScheme": "dark",
+      "path": "/terms",
+      "status": 200,
+      "title": "Terms — Recipe Import Repair",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "seriousCritical": []
+    },
+    {
+      "colorScheme": "dark",
+      "path": "/missing-verification-route",
+      "status": 404,
+      "title": "Page not found — Recipe Import Repair",
+      "lang": "en",
+      "h1Count": 1,
+      "mainCount": 1,
+      "seriousCritical": []
+    }
+  ],
+  "mobileKeyboardMotion": {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "horizontalOverflow": false,
+    "tooSmall": [],
+    "motion": [],
+    "skipFocused": true,
+    "focusStyle": {
+      "outline": "rgb(158, 63, 50) solid 3px",
+      "boxShadow": "none"
+    },
+    "text200": {
+      "scrollWidth": 390,
+      "viewportWidth": 390,
+      "marginNoteVisible": false
+    }
+  },
+  "pwa": {
+    "scope": "https://recipe-import-repair.sociobot.in/",
+    "controlled": true,
+    "offlineHeadingVisible": true,
+    "offlineStrip": true,
+    "sampleAvailable": true
+  }
+}
