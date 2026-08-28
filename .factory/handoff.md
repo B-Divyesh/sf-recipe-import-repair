@@ -1,3 +1,30 @@
+# Recipe Import Repair verification handoff — PASS
+
+- Work order: `recipe-import-repair-verify-5`
+- Verified candidate: `05ba606bd137ffbb9d7103f937d4289efd4081a0`
+- Live URL: <https://recipe-import-repair.sociobot.in>
+- Date: 2026-08-28 UTC
+- Result: **PASS**
+
+Independent verification found no release-blocking defects. The deployed
+assets exactly match a fresh `npm run build` from the candidate. Every one of
+the 12 commands in `.factory/claims.json`, all unit and browser tests,
+typecheck, lint, and the production build passed. The prior verifier's
+31-repair undo boundary and overlapping batch-repair failures were each
+reproduced live and now pass.
+
+How to verify: run `npm ci`, every command listed in `.factory/claims.json`,
+`npm test`, `npm run typecheck`, `npm run lint`, and `npm run build`; then use
+`/demo` to apply all repairs, undo, export, reset, and leave demo. The complete
+evidence, deployment hashes, accessibility/PWA/privacy checks, and Lighthouse
+report are in [`.factory/verification-5.md`](verification-5.md).
+
+Known gaps: none found. This product has no backend, account, payment, AI,
+package, or CLI surface, so server rate-limit, Entra, concurrency, and consumer
+installation checks do not apply.
+
+---
+
 # Recipe Import Repair repair handoff
 
 - Work order: `recipe-import-repair-repair-4`
