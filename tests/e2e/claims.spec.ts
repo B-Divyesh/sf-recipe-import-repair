@@ -1,9 +1,11 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-test('@claim:format-import reads Markdown into editable recipe fields', async ({ page }) => {
-  await page.goto('/');
-  await page.getByLabel('Paste JSON, JSON-LD, or Markdown').fill(`# Lemon rice
+test('@claim:format-import reads Recipe JSON, JSON-LD, and Markdown into editable recipe fields', async ({ page }) => {
+  const fixtures = [
+    { format: 'JSON', title: 'Json rice', source: JSON.stringify({ title: 'Json rice', sourceUrl: 'https://example.com/json-rice', ingredients: ['2 cups rice'], steps: ['Cook the rice.'] }) },
+    { format: 'JSON-LD', title: 'Linked rice', source: JSON.stringify({ '@context': 'https://schema.org', '@type': 'Recipe', name: 'Linked rice', url: 'https://example.com/linked-rice', recipeIngredient: ['2 cups rice'], recipeInstructions: ['Cook the rice.'] }) },
+    { format: 'Markdown', title: 'Lemon rice', source: `# Lemon rice
 
 Source: https://example.com/lemon-rice
 
@@ -13,21 +15,68 @@ Source: https://example.com/lemon-rice
 
 ## Steps
 1. Cook the rice.
-2. Add lemon juice.`);
-  await page.getByRole('button', { name: 'Inspect recipe' }).click();
-  await expect(page.getByLabel(/Title/)).toHaveValue('Lemon rice');
-  await expect(page.getByLabel(/Source URL/)).toHaveValue('https://example.com/lemon-rice');
-  await expect(page.locator('.format-badge')).toHaveText('Markdown source');
+2. Add lemon juice.` },
+  ];
+  for (const fixture of fixtures) {
+    await page.goto('/');
+    await page.getByLabel('Paste JSON, JSON-LD, or Markdown').fill(fixture.source);
+    await page.getByRole('button', { name: 'Inspect recipe' }).click();
+    await expect(page.getByLabel(/Title/)).toHaveValue(fixture.title);
+    await expect(page.locator('.format-badge')).toHaveText(`${fixture.format} source`);
+  }
 });
 
-test('@claim:reversible-repairs applies and undoes an exact change', async ({ page }) => {
+test('@claim:reversible-repairs applies and undoes every suggested repair', async ({ page }) => {
   await page.goto('/demo');
-  const firstIngredient = page.locator('#ingredient-0');
-  await expect(firstIngredient).toHaveValue('1½ cups cooked white beans');
-  await page.getByRole('button', { name: 'Convert fraction' }).click();
-  await expect(firstIngredient).toHaveValue('1 1/2 cups cooked white beans');
-  await page.getByRole('button', { name: 'Undo last change' }).click();
-  await expect(firstIngredient).toHaveValue('1½ cups cooked white beans');
+  const repairs = [
+    { button: 'Convert fraction', field: '#ingredient-0', before: '1½ cups cooked white beans', after: '1 1/2 cups cooked white beans' },
+    { button: 'Fix decimal point', field: '#ingredient-1', before: '2..5 tablespoons olive oil', after: '2.5 tbsp olive oil' },
+    { button: 'Use tsp', field: '#ingredient-3', before: '3 teaspoons tomato paste', after: '3 tsp tomato paste' },
+  ];
+  for (const repair of repairs) {
+    await expect(page.locator(repair.field)).toHaveValue(repair.before);
+    await page.getByRole('button', { name: repair.button }).click();
+    await expect(page.locator(repair.field)).toHaveValue(repair.after);
+    await page.getByRole('button', { name: 'Undo last change' }).click();
+    await expect(page.locator(repair.field)).toHaveValue(repair.before);
+  }
+});
+
+test('@claim:repair-diagnostics identifies malformed quantities, verbose units, missing data, invalid addresses, and oversized fields', async ({ page }) => {
+  const inspect = async (source: string) => {
+    await page.goto('/');
+    await page.getByLabel('Paste JSON, JSON-LD, or Markdown').fill(source);
+    await page.getByRole('button', { name: 'Inspect recipe' }).click();
+  };
+  await page.goto('/demo');
+  await expect(page.getByText('starts with a malformed decimal')).toBeVisible();
+  await expect(page.getByText('uses “teaspoons”')).toBeVisible();
+  await inspect(JSON.stringify({ title: '', ingredients: [], steps: [] }));
+  await expect(page.getByText('The recipe has no title.')).toBeVisible();
+  await expect(page.getByText('No ingredients were found.')).toBeVisible();
+  await expect(page.getByText('No steps were found.')).toBeVisible();
+  await inspect(JSON.stringify({ title: 'Bad source', sourceUrl: 'ftp://example.com/recipe', ingredients: ['1 cup rice'], steps: ['Cook.'] }));
+  await expect(page.getByText('The source is not a valid web address.')).toBeVisible();
+  await inspect(JSON.stringify({ title: 'T'.repeat(121), ingredients: [`1 cup ${'i'.repeat(215)}`], steps: ['s'.repeat(1001)] }));
+  await expect(page.getByText('The title has 121 characters.')).toBeVisible();
+  await expect(page.getByText('Ingredient 1 has 221 characters.')).toBeVisible();
+  await expect(page.getByText('Step 1 has 1001 characters.')).toBeVisible();
+});
+
+test('@claim:exact-change-preview shows before and after for every suggested repair', async ({ page }) => {
+  await page.goto('/demo');
+  const expected = [
+    ['1½ cups cooked white beans', '1 1/2 cups cooked white beans'],
+    ['2..5 tablespoons olive oil', '2.5 tbsp olive oil'],
+    ['3 teaspoons tomato paste', '3 tsp tomato paste'],
+  ];
+  const changes = page.locator('.issue details');
+  await expect(changes).toHaveCount(expected.length);
+  for (let index = 0; index < expected.length; index += 1) {
+    await changes.nth(index).locator('summary').click();
+    await expect(changes.nth(index)).toContainText(expected[index][0]);
+    await expect(changes.nth(index)).toContainText(expected[index][1]);
+  }
 });
 
 test('@claim:neutral-export exports repaired JSON with attribution', async ({ page }) => {
@@ -135,6 +184,24 @@ test('keyboard repair keeps focus on Undo last change after the workbench rerend
   await expect(page.getByText('Ready to export', { exact: true })).toBeVisible();
 });
 
+test('file pickers have a visible proxy focus and field edits retain tab position', async ({ page }) => {
+  await page.goto('/');
+  for (const id of ['#hero-file', '#bench-home-file']) {
+    const input = page.locator(id);
+    await input.focus();
+    await expect(input).toBeFocused();
+    const box = await input.boundingBox();
+    expect(box?.width).toBeGreaterThanOrEqual(44);
+    expect(box?.height).toBeGreaterThanOrEqual(44);
+    await expect(input.locator('..')).toHaveCSS('outline-width', '3px');
+  }
+  await page.goto('/demo');
+  const sourceUrl = page.getByLabel(/Source URL/);
+  await sourceUrl.fill('https://example.com/changed');
+  await sourceUrl.press('Tab');
+  await expect(page.locator('#ingredient-0')).toBeFocused();
+});
+
 test('pages meet the automated accessibility baseline', async ({ page }) => {
   for (const path of ['/', '/demo', '/privacy', '/terms', '/missing-page']) {
     await page.goto(path);
@@ -143,9 +210,11 @@ test('pages meet the automated accessibility baseline', async ({ page }) => {
     expect(results.violations.filter((item) => ['serious', 'critical'].includes(item.impact ?? ''))).toEqual([]);
   }
   await page.emulateMedia({ colorScheme: 'dark' });
-  await page.goto('/demo');
-  const darkResults = await new AxeBuilder({ page }).analyze();
-  expect(darkResults.violations.filter((item) => ['serious', 'critical'].includes(item.impact ?? ''))).toEqual([]);
+  for (const path of ['/', '/demo', '/privacy', '/terms']) {
+    await page.goto(path);
+    const darkResults = await new AxeBuilder({ page }).analyze();
+    expect(darkResults.violations.filter((item) => ['serious', 'critical'].includes(item.impact ?? ''))).toEqual([]);
+  }
 });
 
 test('mobile layout has no horizontal overflow', async ({ page }) => {
@@ -153,6 +222,19 @@ test('mobile layout has no horizontal overflow', async ({ page }) => {
   await page.goto('/demo');
   const sizes = await page.evaluate(() => ({ body: document.body.scrollWidth, viewport: document.documentElement.clientWidth }));
   expect(sizes.body).toBeLessThanOrEqual(sizes.viewport);
+});
+
+test('mobile interactive targets meet the 44 px baseline', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/demo');
+  const selectors = ['.wordmark', '.demo-strip a', '.demo-strip button', 'summary', '.site-footer nav a'];
+  for (const selector of selectors) {
+    for (const target of await page.locator(selector).all()) {
+      const box = await target.boundingBox();
+      expect(box, `${selector} should have a box`).not.toBeNull();
+      expect(Math.min(box!.width, box!.height), `${selector} should be at least 44 px in both dimensions`).toBeGreaterThanOrEqual(44);
+    }
+  }
 });
 
 test('primary routes load without console errors', async ({ page }) => {

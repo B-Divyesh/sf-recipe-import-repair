@@ -4,14 +4,14 @@
     "claim": "Reads Recipe JSON, JSON-LD, and Markdown into editable fields",
     "where": "landing workbench, README",
     "test": "npm test -- --grep @claim:format-import",
-    "sandbox": "fresh browser context; paste the shipped Markdown fixture and assert parsed title, source, and format"
+    "sandbox": "fresh browser context; paste JSON, JSON-LD, and Markdown fixtures separately and assert each parsed title and source format"
   },
   {
     "id": "reversible-repairs",
     "claim": "Every suggested repair can be undone",
     "where": "landing method, demo toolbar, README",
     "test": "npm test -- --grep @claim:reversible-repairs",
-    "sandbox": "demo data; apply the fraction repair, assert the exact result, undo, and assert the original"
+    "sandbox": "demo data; apply each of the three suggested repairs separately, assert its exact result, undo, and assert its original value"
   },
   {
     "id": "neutral-export",
@@ -68,5 +68,19 @@
     "where": "landing limits, README",
     "test": "npm test -- --grep @claim:instructions-unchanged",
     "sandbox": "fresh browser context; record every demo instruction, apply all suggested repairs, and assert every instruction is byte-for-byte unchanged"
+  },
+  {
+    "id": "repair-diagnostics",
+    "claim": "Points to malformed quantities, verbose units, missing data, invalid source addresses, and oversized fields",
+    "where": "README",
+    "test": "npm test -- --grep @claim:repair-diagnostics",
+    "sandbox": "fresh browser context; inspect deterministic demo and JSON fixtures and assert each named diagnostic message"
+  },
+  {
+    "id": "exact-change-preview",
+    "claim": "Every suggested repair shows its exact before and after value",
+    "where": "landing method, README",
+    "test": "npm test -- --grep @claim:exact-change-preview",
+    "sandbox": "fresh browser context; open each demo repair preview and assert its exact Before and After values"
   }
 ]

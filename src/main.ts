@@ -55,6 +55,7 @@ let editHistory: Snapshot[] = [];
 let repairLog: string[] = [];
 let showSource = false;
 let isOffline = !navigator.onLine;
+let pendingFocusSelector = '';
 
 if (isDemo) parseCurrentSource(false);
 
@@ -263,8 +264,7 @@ function homePage(): string {
         <p class="lede">For self-hosted recipe keepers who need clear fixes before an import changes their collection.</p>
         <div class="hero-actions">
           <a class="button primary" href="/demo" data-nav>Try it with sample data</a>
-          <label class="button secondary" for="hero-file">Choose your file</label>
-          <input id="hero-file" class="visually-hidden" type="file" accept=".json,.jsonld,.md,.markdown,text/markdown,application/json" />
+          <label class="button secondary file-picker">Choose your file<input id="hero-file" class="file-input" type="file" accept=".json,.jsonld,.md,.markdown,text/markdown,application/json" /></label>
         </div>
         <p class="action-note">The sample opens with three repairable issues.</p>
         ${factList()}
@@ -361,8 +361,7 @@ function workbench(expanded: boolean): string {
     ${notice ? `<div class="sr-only" aria-live="polite">${escapeHtml(notice)}</div>` : ''}
     <div class="bench-grid">
       <div class="source-panel">
-        <div class="panel-heading"><div><p class="step-label">Input</p><${panelHeading}>Recipe source</${panelHeading}></div><label class="file-label" for="${expanded ? 'demo' : 'bench-home'}-file">Choose file</label></div>
-        <input id="${expanded ? 'demo' : 'bench-home'}-file" class="visually-hidden" type="file" accept=".json,.jsonld,.md,.markdown,text/markdown,application/json" />
+        <div class="panel-heading"><div><p class="step-label">Input</p><${panelHeading}>Recipe source</${panelHeading}></div><label class="file-label file-picker">Choose file<input id="${expanded ? 'demo' : 'bench-home'}-file" class="file-input" type="file" accept=".json,.jsonld,.md,.markdown,text/markdown,application/json" /></label></div>
         <label class="source-label" for="source-text">Paste JSON, JSON-LD, or Markdown</label>
         <textarea id="source-text" class="source-text" rows="${expanded ? '15' : '10'}" spellcheck="false" placeholder="# Tomato beans&#10;&#10;## Ingredients&#10;- 2 cups beans&#10;&#10;## Steps&#10;1. Warm the beans.">${escapeHtml(source)}</textarea>
         <p class="input-help">Maximum file size: 2 MB. Web addresses are preserved and never fetched.</p>
@@ -400,6 +399,30 @@ function renderAndFocus(selector: string): void {
   render();
   requestAnimationFrame(() => document.querySelector<HTMLElement>(selector)?.focus());
 }
+
+function focusSelector(element: Element | null): string {
+  if (!(element instanceof HTMLElement)) return '';
+  if (element.id) return `#${CSS.escape(element.id)}`;
+  const field = element.dataset.field;
+  if (field) return `[data-field="${CSS.escape(field)}"]`;
+  const action = element.dataset.action;
+  if (action) return `[data-action="${CSS.escape(action)}"]`;
+  return '';
+}
+
+function nextFocusableSelector(element: HTMLElement, backwards: boolean): string {
+  const focusable = Array.from(app.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), summary')).filter((item) => item.tabIndex >= 0);
+  const index = focusable.indexOf(element);
+  if (index < 0) return '';
+  return focusSelector(focusable[(index + (backwards ? -1 : 1) + focusable.length) % focusable.length]);
+}
+
+app.addEventListener('keydown', (event) => {
+  const target = event.target;
+  if (event.key === 'Tab' && target instanceof HTMLElement && target.dataset.field) {
+    pendingFocusSelector = nextFocusableSelector(target, event.shiftKey);
+  }
+});
 
 app.addEventListener('click', (event) => {
   const target = event.target as HTMLElement;
@@ -455,10 +478,12 @@ app.addEventListener('change', async (event) => {
   }
   const field = target.dataset.field;
   if (field && recipe) {
+    const focusAfterEdit = pendingFocusSelector || focusSelector(document.activeElement) || focusSelector(target);
+    pendingFocusSelector = '';
     saveSnapshot(`Edit ${field.replace(/-/g, ' ')}`);
     updateRecipeField(field, target.value);
     notice = `${field.replace(/-/g, ' ')} updated.`;
-    render();
+    renderAndFocus(focusAfterEdit);
   }
 });
 

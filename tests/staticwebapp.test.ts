@@ -15,4 +15,17 @@ describe('Azure Static Web Apps routing', () => {
     expect(config.routes.filter((route) => route.rewrite === '/index.html').map((route) => route.route)).toEqual(['/demo', '/privacy', '/terms']);
     expect(config.responseOverrides['404']).toEqual({ rewrite: '/404.html' });
   });
+
+  test('ships a discoverable manifest and a complete static 404 skeleton', async () => {
+    const [index, notFound] = await Promise.all([
+      readFile(resolve('index.html'), 'utf8'),
+      readFile(resolve('public/404.html'), 'utf8'),
+    ]);
+    expect(index).toContain('rel="manifest" href="/manifest.webmanifest"');
+    expect(notFound).toContain('href="#main"');
+    expect(notFound).toContain('<nav aria-label="Main navigation">');
+    expect(notFound).toContain('href="/privacy"');
+    expect(notFound).toContain('href="/terms"');
+    expect(notFound).toContain('Built by Param Factory');
+  });
 });
