@@ -110,6 +110,10 @@ test('pages meet the automated accessibility baseline', async ({ page }) => {
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations.filter((item) => ['serious', 'critical'].includes(item.impact ?? ''))).toEqual([]);
   }
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.goto('/demo');
+  const darkResults = await new AxeBuilder({ page }).analyze();
+  expect(darkResults.violations.filter((item) => ['serious', 'critical'].includes(item.impact ?? ''))).toEqual([]);
 });
 
 test('mobile layout has no horizontal overflow', async ({ page }) => {
@@ -117,4 +121,17 @@ test('mobile layout has no horizontal overflow', async ({ page }) => {
   await page.goto('/demo');
   const sizes = await page.evaluate(() => ({ body: document.body.scrollWidth, viewport: document.documentElement.clientWidth }));
   expect(sizes.body).toBeLessThanOrEqual(sizes.viewport);
+});
+
+test('primary routes load without console errors', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('console', (message) => {
+    if (message.type() === 'error') errors.push(message.text());
+  });
+  page.on('pageerror', (error) => errors.push(error.message));
+  for (const path of ['/', '/demo', '/privacy', '/terms']) {
+    await page.goto(path);
+    await expect(page.locator('main')).toBeVisible();
+  }
+  expect(errors).toEqual([]);
 });

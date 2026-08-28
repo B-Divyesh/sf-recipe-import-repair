@@ -129,9 +129,8 @@ function parseJson(source: string): { format: InputFormat; recipe: Recipe } {
   let value: unknown;
   try {
     value = JSON.parse(source);
-  } catch (error) {
-    const detail = error instanceof Error ? error.message : 'Unknown JSON error';
-    throw new Error(`The JSON could not be read: ${detail}. Fix the marked punctuation and try again.`);
+  } catch {
+    throw new Error('The JSON could not be read. Fix the marked punctuation and try again.');
   }
   const node = findRecipeNode(value);
   const ingredientsValue = node.recipeIngredient ?? node.ingredients ?? [];

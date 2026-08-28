@@ -96,7 +96,7 @@ h3 { line-height: 1.25; }
 .text-button { min-height: 44px; padding: 6px 4px; border: 0; background: transparent; color: var(--blue-strong); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .bench-grid { display: grid; grid-template-columns: minmax(300px, 0.76fr) minmax(480px, 1.24fr); }
 .source-panel, .result-panel { min-width: 0; padding: clamp(18px, 3vw, 32px); }
-.source-panel { border-right: 2px solid var(--ink); background: rgba(244, 239, 223, 0.56); }
+.source-panel { border-right: 2px solid var(--ink); background: color-mix(in srgb, var(--paper) 68%, var(--paper-raised)); }
 .panel-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
 .panel-heading h2, .panel-heading h3 { margin: 0; font-family: var(--display); font-size: 1.5rem; letter-spacing: normal; }
 .file-label { min-height: 44px; padding: 7px 12px; box-shadow: 2px 2px 0 var(--ink); font-size: 0.86rem; }
