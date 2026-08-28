@@ -1,0 +1,49 @@
+{
+  "checkedAt": "2026-08-28T23:06:11.619Z",
+  "url": "https://recipe-import-repair.sociobot.in",
+  "overlappingRepairs": {
+    "button": "Apply 2 safe repairs",
+    "ingredientAfter": "1 1/2 tbsp oil",
+    "issuesAfter": 0,
+    "readyAfter": true
+  },
+  "undoBoundary": {
+    "appliedCount": 31,
+    "availableUndoCount": 31,
+    "remainingRepairedLines": 0
+  },
+  "privacy": {
+    "requestCount": 4,
+    "allSameOrigin": true,
+    "consoleErrors": 0,
+    "localStorageKeys": 0,
+    "demoSessionKeysAfterExit": 0
+  },
+  "accessibility": {
+    "routesCheckedPerTheme": 5,
+    "themes": ["light", "dark"],
+    "seriousOrCriticalAxeViolations": 0,
+    "mobileViewport": "390x844",
+    "undersizedTargets": 0,
+    "horizontalOverflow": false,
+    "reducedMotionViolations": 0
+  },
+  "pwa": {
+    "controlled": true,
+    "updateCompleted": true,
+    "offlineDemoReload": true,
+    "offlineStatusVisible": true
+  },
+  "lighthouse": {
+    "performance": 100,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "seo": 100,
+    "fcpSeconds": 0.9,
+    "lcpSeconds": 1.2,
+    "tbtMilliseconds": 40,
+    "cls": 0,
+    "transfer": "81 KiB"
+  },
+  "deploymentId": "6e1ba125-dce7-467d-87ac-57942c6beef9"
+}
