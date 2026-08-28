@@ -25,4 +25,4 @@
 
 ## Known gaps / next steps
 
-No known product gaps. Commit `7e0e9e462ea01c25a2974db1e750190548e474c5` was pushed to `origin/main`. At handoff, the public hostname still served the prior deployment (`Last-Modified: 20:49:06 UTC`, old 404 without the shared skeleton), so the factory deployment worker should wait for propagation and then confirm the configured static 404 remains HTTP 404, the manifest link is live, and headers/identity match this commit. This repository has no deployment credential or workflow to invoke directly.
+No known product gaps. Commit `7e0e9e462ea01c25a2974db1e750190548e474c5` was pushed to `origin/main`. At handoff, the public hostname still served the prior deployment (`Last-Modified: 19:49:06 UTC`, old 404 without the shared skeleton), so the factory deployment worker should wait for propagation and then confirm the configured static 404 remains HTTP 404, the manifest link is live, and headers/identity match this commit. This repository has no deployment credential or workflow to invoke directly.
