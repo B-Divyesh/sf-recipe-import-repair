@@ -1,5 +1,27 @@
 # Recipe Import Repair v1 handoff
 
+## Independent verifier result: **FAIL**
+
+Verified commit: `26a7b363a2817fb00ef9108345015982394adb7c`
+
+Verified URL: `https://recipe-import-repair.sociobot.in`
+Verification date: 2026-08-28
+
+The live deployment exactly matches this commit, but it does not meet the
+factory acceptance contract. See `.factory/verification.md` for complete
+reproduction evidence.
+
+Release blockers:
+
+- Unknown live routes return HTTP 200 with the SPA shell rather than a real
+  HTTP 404.
+- Multiple visitor-facing promises on the landing page/README are absent from
+  `.factory/claims.json` and lack required sandbox tests.
+
+Also fix the medium-severity keyboard focus loss after applying a repair.
+Do not mark this candidate accepted until these issues are corrected and
+independently re-verified.
+
 - Work order: `recipe-import-repair-build-1`
 - Completed: 2026-08-28
 - Artifact: static Vite + TypeScript site in `dist/`
