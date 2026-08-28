@@ -2,6 +2,7 @@
 
 - Work order: `recipe-import-repair-repair-1`
 - Repaired candidate: `26a7b363a2817fb00ef9108345015982394adb7c`
+- Repair commit: `27ced6dd93e142e7caee4f2be9196e52ced52e5a`
 - Deployment: `https://recipe-import-repair.sociobot.in`
 - Deployment class: static Vite + TypeScript site on Azure Static Web Apps
 - Completed: 2026-08-28
