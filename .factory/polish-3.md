@@ -3,8 +3,8 @@
 - Work order: `recipe-import-repair-polish-3-retry1`
 - Reviewed candidate: `ffa933e8975dfd6588559b37f35d60b6ae5b2433`
 - Review report: `ca196e18c58922a739fb9e3e81bcdba2e61a1ef2`
-- Product repair commit: `6ffbea418e6184e5301bcc2779ee5919d9b71b3c`
-- Deployment ID: `e6b6a08c-a55a-4785-806d-eb4a769b9bd4`
+- Product repair commits: `6ffbea418e6184e5301bcc2779ee5919d9b71b3c` and `1d6afa1a8293f01919069882fb34b61edc6358a3`
+- Deployment ID: `601605bc-1e57-4f9c-963a-c16ff0bee939`
 - Live demo: <https://recipe-import-repair.sociobot.in/?demo=1>
 
 ## Finding map
@@ -27,18 +27,18 @@
 | F-2-10 | Kept the valid ISO `exportedAt` assertion in repair-details JSON. | `@claim:neutral-export`; clean-clone claim run. |
 | F-2-11 | Kept the split README parsing and diagnostics sentences. | `.factory/copy-audit.md`; static copy test. |
 | F-2-12 | Kept **source URL** as the single user-facing term. | `@claim:source-url-no-fetch`; live same-origin request test. |
-| F-3-1 | Rewrote the demo H1 to **Repair Rosemary tomato beans**. On a 390 px screen, the parsed-result panel now precedes the source editor and contains a populated editable **Sample title**, a concrete first issue, and **Apply 3 suggested repairs**. The compact mobile toolbar retains the clear action; the source remains available below. | Enhanced `@claim:demo-sample-issues` measures every required element at `bottom <= 844`, edits then resets the sample title, and applies/reset repairs. `qa-artifacts/polish-3/local/demo-390.png`; `qa-artifacts/polish-3/live/demo-390-cold.png`; <https://recipe-import-repair.sociobot.in/?demo=1>. |
+| F-3-1 | Rewrote the demo H1 to **Repair Rosemary tomato beans**. On a 390 px screen, a mobile sample summary now comes before the source editor in both DOM and visual order. It contains a populated editable **Sample title**, a concrete first issue, and **Apply 3 suggested repairs**; the full source and result panels remain available below. | Enhanced `@claim:demo-sample-issues` measures every required element at `bottom <= 844`, edits then resets the sample title, and applies/reset repairs. `qa-artifacts/polish-3/local/demo-390.png`; `qa-artifacts/polish-3/live/demo-390-cold.png`; <https://recipe-import-repair.sociobot.in/?demo=1>. |
 | F-3-2 | Expanded `@claim:format-import` for JSON, JSON-LD, and Markdown. Every fixture now asserts title, source URL, first ingredient, and first step, then edits a title and asserts the rerendered value. | `npm test -- --grep @claim:format-import` in the clean clone; full live browser suite. |
 
 ## Verification
 
-- Fresh clone: `/tmp/recipe-import-repair-polish3.3lKSMR/repo` at `6ffbea4`; `npm ci` completed with zero vulnerabilities.
+- Fresh clone: `/tmp/recipe-import-repair-polish3-final.UHDRja/repo` at `1d6afa1`; `npm ci` completed with zero vulnerabilities.
 - Every one of the 14 exact commands in `.factory/claims.json` passed independently.
 - The clean full gate passed: 10 Vitest/config tests, 28 Chromium browser tests, `npm run lint`, and `npm run build`. `dist/index.html` exists.
 - Live browser gate: `PLAYWRIGHT_BASE_URL=https://recipe-import-repair.sociobot.in npm run test:e2e` passed all 28 tests, including Axe checks in light and dark modes, controlled offline reload, same-origin request capture, route history/focus, and mobile target/overflow checks.
 - `/opt/fleet/lib/verify-url.sh` passed Home, `?demo=1`, Privacy, and Terms without console or page errors. Its reports are in `qa-artifacts/polish-3/live/verify-*/verify.json`.
 - Live routes `/`, `/demo`, `/privacy`, and `/terms` return 200; `/polish-3-not-found` returns a designed HTTP 404.
-- Live and local JavaScript SHA-256 both equal `ab314aaf8b8405614ac1a64f2735386a19fcc9590641e1fbfa51c5c0ea8524a4`.
-- Lighthouse mobile on the live demo: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 904 ms, LCP 958 ms, TBT 59 ms, CLS 0. Evidence: `qa-artifacts/polish-3/live/lighthouse-demo-mobile.json`.
+- Live and local JavaScript SHA-256 both equal `b35319f3004faf3088608e6672c074756525b848f97d45fd42a5d9ac5668d557`.
+- Lighthouse mobile on the live demo: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 944 ms, LCP 990 ms, TBT 41 ms, CLS 0. Evidence: `qa-artifacts/polish-3/live/lighthouse-demo-mobile.json`.
 
 No finding of any severity remains open.

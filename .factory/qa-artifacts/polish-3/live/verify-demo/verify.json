@@ -1,6 +1,6 @@
 {
   "url": "https://recipe-import-repair.sociobot.in/?demo=1",
-  "loadMs": 553,
+  "loadMs": 851,
   "errors": [],
   "a11y": {
     "title": "Demo — Recipe Import Repair",
@@ -9,6 +9,6 @@
     "main": true,
     "imgsMissingAlt": 0,
     "buttonsUnlabeled": 0,
-    "textLength": 1994
+    "textLength": 2060
   }
 }
