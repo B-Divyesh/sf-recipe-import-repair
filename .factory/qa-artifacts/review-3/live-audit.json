@@ -1,0 +1,216 @@
+{
+  "cold": {
+    "mobile": {
+      "title": "Recipe Import Repair — fix recipe import files",
+      "statusText": "Skip to main content\n✓\nRecipe Import Repair\nDemo\nHow it works\nPrivacy\n\nREPAIR RECIPE FILES IN YOUR BROWSER\n\nFix broken recipe imports before saving\n\nFor people who run their own recipe app and need to fix a file before importing it.\n\nTry it with sample data\nChoose your file\n\nThe sample opens with three repairable issues.\n\n⌂\nFiles stay in this browser\n↯\nWorks offline after first visit\n$0\nFree — no account needed\nInspect recipe fields. Review each repair. Preserve source attribution.\n\nRECIPE FILE PREVIEW\n\nInspect a recipe file\n\nPaste JSON, JSON-LD, or Markdown. You see the parsed fields before you export anything.\n\nNO FILE READ\nClear recipe and results\n\nINPUT\n\nRecipe source\nChoose file\nPaste JSON, JSON-LD, or Markdown\n\nMaximum file size: 2 MB. Source URLs are preserved and never opened.\n\nInspect recipe\n\nINSPECTION\n\nParsed recipe\n↳\nYour parsed fields will appear here\n\nPaste recipe text or choose a file. Then inspect it.\n\nHOW RECIPE REPAIR WORKS\n\nRepair a recipe in three steps\n01\nRead the file\n\nThe tool separates title, source, ingredients, and steps.\n\n02\nReview each repair\n\nEvery suggested repair shows its exact before and after value.\n\n03\nChoose an export format\n\nDownload Recipe JSON-LD or keep the source file format.\n\nPRIVACY AND LIMITS\n\nWhat stays in your browser\n\nThe tool does not fetch recipe pages. Repairs do not change cooking instructions.\n\nNo recipe text leaves your device. No account is required.\n\nRecipe Import Repair\n\nFix recipe files before importing them into your recipe app.\n\nPrivacy\nTerms\nBuilt by Param Factory\n(opens in a new tab)\n\nv1.0.0 · Original generated illustration\n\nRecipe Import Repair — fix recipe import files",
+      "scrollY": 0,
+      "h1Count": 1,
+      "h1": {
+        "text": "Fix broken recipe imports before saving",
+        "top": 193.34375,
+        "bottom": 357.59375,
+        "fullyVisible": true
+      },
+      "lede": {
+        "text": "For people who run their own recipe app and need to fix a file before importing it.",
+        "top": 381.59375,
+        "bottom": 461.9375,
+        "fullyVisible": true
+      },
+      "primary": {
+        "text": "Try it with sample data",
+        "top": 489.9375,
+        "bottom": 540.734375,
+        "fullyVisible": true
+      },
+      "actionNote": {
+        "text": "The sample opens with three repairable issues.",
+        "top": 618.734375,
+        "bottom": 663.390625,
+        "fullyVisible": true
+      },
+      "facts": {
+        "text": "⌂ Files stay in this browser\n    ↯ Works offline after first visit\n    $0 Free — no account needed",
+        "top": 691.390625,
+        "bottom": 789.390625,
+        "fullyVisible": true
+      },
+      "main": true,
+      "lang": "en",
+      "bodyWidth": 390,
+      "viewportWidth": 390,
+      "status": 200
+    },
+    "desktop": {
+      "title": "Recipe Import Repair — fix recipe import files",
+      "statusText": "Skip to main content\n✓\nRecipe Import Repair\nDemo\nHow it works\nPrivacy\nCHECK\nBEFORE IMPORT\n\nREPAIR RECIPE FILES IN YOUR BROWSER\n\nFix broken recipe imports before saving\n\nFor people who run their own recipe app and need to fix a file before importing it.\n\nTry it with sample data\nChoose your file\n\nThe sample opens with three repairable issues.\n\n⌂\nFiles stay in this browser\n↯\nWorks offline after first visit\n$0\nFree — no account needed\nInspect recipe fields. Review each repair. Preserve source attribution.\n\nRECIPE FILE PREVIEW\n\nInspect a recipe file\n\nPaste JSON, JSON-LD, or Markdown. You see the parsed fields before you export anything.\n\nNO FILE READ\nClear recipe and results\n\nINPUT\n\nRecipe source\nChoose file\nPaste JSON, JSON-LD, or Markdown\n\nMaximum file size: 2 MB. Source URLs are preserved and never opened.\n\nInspect recipe\n\nINSPECTION\n\nParsed recipe\n↳\nYour parsed fields will appear here\n\nPaste recipe text or choose a file. Then inspect it.\n\nHOW RECIPE REPAIR WORKS\n\nRepair a recipe in three steps\n01\nRead the file\n\nThe tool separates title, source, ingredients, and steps.\n\n02\nReview each repair\n\nEvery suggested repair shows its exact before and after value.\n\n03\nChoose an export format\n\nDownload Recipe JSON-LD or keep the source file format.\n\nPRIVACY AND LIMITS\n\nWhat stays in your browser\n\nThe tool does not fetch recipe pages. Repairs do not change cooking instructions.\n\nNo recipe text leaves your device. No account is required.\n\nRecipe Import Repair\n\nFix recipe files before importing them into your recipe app.\n\nPrivacy\nTerms\nBuilt by Param Factory\n(opens in a new tab)\n\nv1.0.0 · Original generated illustration\n\nRecipe Import Repair — fix recipe import files",
+      "scrollY": 0,
+      "h1Count": 1,
+      "h1": {
+        "text": "Fix broken recipe imports before saving",
+        "top": 171.34375,
+        "bottom": 437.265625,
+        "fullyVisible": true
+      },
+      "lede": {
+        "text": "For people who run their own recipe app and need to fix a file before importing it.",
+        "top": 461.265625,
+        "bottom": 556.515625,
+        "fullyVisible": true
+      },
+      "primary": {
+        "text": "Try it with sample data",
+        "top": 584.515625,
+        "bottom": 636.515625,
+        "fullyVisible": true
+      },
+      "actionNote": {
+        "text": "The sample opens with three repairable issues.",
+        "top": 650.515625,
+        "bottom": 672.84375,
+        "fullyVisible": true
+      },
+      "facts": {
+        "text": "⌂ Files stay in this browser\n    ↯ Works offline after first visit\n    $0 Free — no account needed",
+        "top": 700.84375,
+        "bottom": 798.84375,
+        "fullyVisible": true
+      },
+      "main": true,
+      "lang": "en",
+      "bodyWidth": 1440,
+      "viewportWidth": 1440,
+      "status": 200
+    }
+  },
+  "demo": {
+    "initial": {
+      "url": "https://recipe-import-repair.sociobot.in/?demo=1",
+      "title": "Demo — Recipe Import Repair",
+      "h1": "Repair this sample recipe",
+      "banner": "Demo — sample data, nothing is savedReset demoLeave demo and clear sampleLeaving opens a blank workspace and discards this sample.",
+      "recipeTitle": "Rosemary tomato beans",
+      "ingredients": 6,
+      "steps": 3,
+      "repairs": 3,
+      "local": {
+        "real:sentinel": "keep"
+      },
+      "session": {
+        "real:session-sentinel": "keep",
+        "demo:recipe-import-repair:source": "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"Recipe\",\n  \"name\": \"Rosemary tomato beans\",\n  \"description\": \"A weeknight pantry supper from a handwritten family card.\",\n  \"author\": \"Mara Vale\",\n  \"url\": \"https://example.com/mara/rosemary-tomato-beans\",\n  \"recipeYield\": \"4 bowls\",\n  \"prepTime\": \"PT10M\",\n  \"cookTime\": \"PT25M\",\n  \"recipeIngredient\": [\n    \"1½ cups cooked white beans\",\n    \"2..5 tablespoons olive oil\",\n    \"2 cloves garlic, sliced\",\n    \"3 teaspoons tomato paste\",\n    \"1 tbsp chopped rosemary\",\n    \"400 g canned tomatoes\"\n  ],\n  \"recipeInstructions\": [\n    {\"@type\": \"HowToStep\", \"text\": \"Warm the oil and garlic over medium heat.\"},\n    {\"@type\": \"HowToStep\", \"text\": \"Add rosemary, beans, and tomatoes. Simmer for 20 minutes.\"},\n    {\"@type\": \"HowToStep\", \"text\": \"Taste, season, and serve.\"}\n  ]\n}"
+      }
+    },
+    "afterApply": {
+      "repairs": 0,
+      "status": "Ready to exportNo blocking issues remain.",
+      "local": {
+        "real:sentinel": "keep"
+      },
+      "session": {
+        "real:session-sentinel": "keep",
+        "demo:recipe-import-repair:source": "{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"Recipe\",\n  \"name\": \"Rosemary tomato beans\",\n  \"description\": \"A weeknight pantry supper from a handwritten family card.\",\n  \"author\": \"Mara Vale\",\n  \"url\": \"https://example.com/mara/rosemary-tomato-beans\",\n  \"recipeYield\": \"4 bowls\",\n  \"prepTime\": \"PT10M\",\n  \"cookTime\": \"PT25M\",\n  \"recipeIngredient\": [\n    \"1½ cups cooked white beans\",\n    \"2..5 tablespoons olive oil\",\n    \"2 cloves garlic, sliced\",\n    \"3 teaspoons tomato paste\",\n    \"1 tbsp chopped rosemary\",\n    \"400 g canned tomatoes\"\n  ],\n  \"recipeInstructions\": [\n    {\"@type\": \"HowToStep\", \"text\": \"Warm the oil and garlic over medium heat.\"},\n    {\"@type\": \"HowToStep\", \"text\": \"Add rosemary, beans, and tomatoes. Simmer for 20 minutes.\"},\n    {\"@type\": \"HowToStep\", \"text\": \"Taste, season, and serve.\"}\n  ]\n}"
+      }
+    },
+    "afterReset": {
+      "title": "Rosemary tomato beans",
+      "repairs": 3
+    },
+    "afterLeave": {
+      "url": "https://recipe-import-repair.sociobot.in/",
+      "source": "",
+      "local": {
+        "real:sentinel": "keep"
+      },
+      "session": {
+        "real:session-sentinel": "keep"
+      }
+    },
+    "requests": [
+      "https://recipe-import-repair.sociobot.in/",
+      "https://recipe-import-repair.sociobot.in/assets/index-ljOz4nNa.js",
+      "https://recipe-import-repair.sociobot.in/assets/index-pYwe35MY.css",
+      "https://recipe-import-repair.sociobot.in/assets/repair-workbench.webp",
+      "https://recipe-import-repair.sociobot.in/assets/repair-workbench.webp"
+    ],
+    "onlySameOrigin": true
+  },
+  "routes": {
+    "/": {
+      "title": "Recipe Import Repair — fix recipe import files",
+      "h1": [
+        "Fix broken recipe imports before saving"
+      ],
+      "description": "Inspect and repair JSON, JSON-LD, or Markdown recipe files before importing them into your recipe app.",
+      "canonical": "https://recipe-import-repair.sociobot.in/",
+      "ogTitle": "Recipe Import Repair — fix recipe import files",
+      "main": true,
+      "header": true,
+      "footer": true,
+      "status": 200
+    },
+    "/demo": {
+      "title": "Demo — Recipe Import Repair",
+      "h1": [
+        "Repair this sample recipe"
+      ],
+      "description": "Try recipe repair with an isolated sample file, then export Recipe JSON-LD or the repaired source format.",
+      "canonical": "https://recipe-import-repair.sociobot.in/demo",
+      "ogTitle": "Demo — Recipe Import Repair",
+      "main": true,
+      "header": true,
+      "footer": true,
+      "status": 200
+    },
+    "/privacy": {
+      "title": "Privacy — Recipe Import Repair",
+      "h1": [
+        "Privacy in plain words"
+      ],
+      "description": "How Recipe Import Repair handles files and browser data.",
+      "canonical": "https://recipe-import-repair.sociobot.in/privacy",
+      "ogTitle": "Privacy — Recipe Import Repair",
+      "main": true,
+      "header": true,
+      "footer": true,
+      "status": 200
+    },
+    "/terms": {
+      "title": "Terms — Recipe Import Repair",
+      "h1": [
+        "Terms for this free tool"
+      ],
+      "description": "Terms for using the free Recipe Import Repair utility.",
+      "canonical": "https://recipe-import-repair.sociobot.in/terms",
+      "ogTitle": "Terms — Recipe Import Repair",
+      "main": true,
+      "header": true,
+      "footer": true,
+      "status": 200
+    },
+    "/review-3-missing": {
+      "title": "Page not found — Recipe Import Repair",
+      "h1": [
+        "Page not found"
+      ],
+      "description": "This Recipe Import Repair page does not exist.",
+      "canonical": "https://recipe-import-repair.sociobot.in/404.html",
+      "ogTitle": "Page not found — Recipe Import Repair",
+      "main": true,
+      "header": true,
+      "footer": true,
+      "status": 404
+    }
+  },
+  "links": {
+    "https://recipe-import-repair.sociobot.in/#main": 200,
+    "https://recipe-import-repair.sociobot.in/": 200,
+    "https://recipe-import-repair.sociobot.in/demo": 200,
+    "https://recipe-import-repair.sociobot.in/#how-it-works": 200,
+    "https://recipe-import-repair.sociobot.in/privacy": 200,
+    "https://recipe-import-repair.sociobot.in/?demo=1": 200,
+    "https://recipe-import-repair.sociobot.in/terms": 200,
+    "https://hello-factory.sociobot.in/": 200
+  },
+  "console": []
+}

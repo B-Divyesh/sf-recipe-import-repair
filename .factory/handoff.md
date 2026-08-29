@@ -1,54 +1,54 @@
-# Polish 2 handoff — PASS
+# Review 3 handoff — FAIL
 
-- Work order: `recipe-import-repair-polish-2`
-- Base review: `80ba1eb90c879fa95d45729e654a57b9e80d472e`
-- Product repair: `b4b61c4`
-- Evidence commit: `da02a6c`
-- Final QA and handoff commit: `ba1aae9`
-- Deployment: Azure Static Web Apps, ID `bd1889fb-8ce1-43eb-9f20-06b13460f836`
-- Live URL: <https://recipe-import-repair.sociobot.in/?demo=1>
+- Work order: `recipe-import-repair-review-3`
+- Reviewed repository head: `ffa933e8975dfd6588559b37f35d60b6ae5b2433`
+- Live URL: <https://recipe-import-repair.sociobot.in>
 - Date: 2026-08-29 UTC
 
-## What changed
+## What was done
 
-- Closed every finding in `.factory/review-1.md` and `.factory/review-2.md`; the exact finding map is in `.factory/polish-2.md`.
-- Added real Schema.org Recipe JSON-LD and repaired-original exports for JSON, JSON-LD, and Markdown. Each downloaded format imports back into the tool. The detailed repair JSON retains attribution, parsed ingredient fields, and a tested ISO export time.
-- Repaired history scroll/focus restoration and cross-route section focus.
-- Completed route-specific title, description, canonical, Open Graph, and Twitter metadata. Completed 404 metadata and its skip-link target.
-- Rewrote the reviewed first-screen, control, error, and README wording in direct task language. Standardized “source URL.”
-- Preserved the repair-notebook visual identity, isolated `?demo=1` sandbox, reset/leave behavior, privacy model, offline behavior, and static-web deployment class.
-- Updated the verb-first 91-character catalog description, claims manifest, demo documentation, copy audit, and service-worker cache version.
+- Performed fresh 390 × 844 and 1440 × 900 cold reads of the deployed site.
+- Audited every landing-page and README sentence, heading, term, and action.
+- Exercised the one-click demo, repair, reset, leave, storage isolation, same-origin request behavior, and offline flow.
+- Ran every command in `.factory/claims.json` independently from a clean clone.
+- Re-ran the full local and deployed browser suites, build, Axe integration, route metadata, history/focus, live link crawl, HTTP 404, security headers, and `verify-url.sh` checks.
+- Read all earlier review, polish, and handoff reports and independently verified every earlier finding in live behavior and matching source.
+- Recorded the result in `.factory/review-3.md`. Product code was not modified.
+
+## Result
+
+**FAIL:** `.factory/review-3.md` contains one blocking finding and one minor finding.
+
+- `F-3-1` — BLOCKING: at 390 × 844, the first screen after entering the demo does not show the sample name, a populated field, a repair issue, or the apply action.
+- `F-3-2` — Minor: `@claim:format-import` checks only the title and format badge, not all promised editable fields or editability.
+
+All findings from review 1 and review 2 remain fixed.
 
 ## Verification
 
-- Final clean clone `/tmp/recipe-import-repair-final.kfek1C/repo` at `ba1aae9`: `npm ci`, `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` passed.
-- All 14 claim commands in `.factory/claims.json` passed independently in that clone.
-- Final local suite: 10 unit/config tests and 28 Chromium tests passed.
-- Deployed suite: all 27 end-to-end product tests passed against `https://recipe-import-repair.sociobot.in`; the added reviewed-wording regression also passed live.
-- Axe reported zero violations at any impact level across Home, Demo, Privacy, Terms, and the real HTTP 404. The 404 skip link moves focus to main.
-- Live unknown route returned HTTP 404. Home, `/demo`, `/?demo=1`, `/privacy`, and `/terms` returned 200 with route-specific metadata and no console errors.
-- The cold live demo showed three issues, isolated `demo:` session storage, reset, leave-and-clear, suggested repairs, all three export choices, same-origin-only requests, and a working offline reload.
-- Mobile 390 px, 200% text, 44 px targets, dark mode, reduced motion, keyboard focus, link crawl, privacy, and CSP/security-header checks passed.
-- Mobile Lighthouse: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 0.9 s, LCP 1.7 s, TBT 0 ms, CLS 0.
-- Production payload: JS 33,960 bytes raw / 11.76 kB gzip; CSS 17,169 bytes raw / 4.62 kB gzip; hero 60,112 bytes.
-- Deployed/local JS SHA-256 matches: `ca1f8961590497c1efb57a99403d275c52965aea7e7e5d2eeae473cd4d2f7d93`.
-- Screenshots, verifier JSON, Lighthouse JSON, and live 404 capture are under `.factory/evidence/polish-2/`.
+- Clean clone: `/tmp/recipe-import-repair-review3.aVs9Ej/repo` at `ffa933e`.
+- All 14 claim commands: passed independently.
+- Full clean suite: 10 unit/config tests and 28 Chromium tests passed.
+- `npm run build`: passed; `dist/index.html` exists; JS is 33.96 kB raw / 11.76 kB gzip.
+- Live suite: 27 tests passed in the aggregate run; its multi-route Axe test hit the 30-second aggregate timeout, then passed alone with a 60-second limit and zero violations.
+- Live/local JavaScript SHA-256: `ca1f8961590497c1efb57a99403d275c52965aea7e7e5d2eeae473cd4d2f7d93`.
+- Live request capture: same-origin only; seeded real storage remained unchanged; reset and leave behaved correctly.
+- `verify-url.sh`: Home, Demo, Privacy, and Terms passed with no console/page errors.
+- Evidence: `.factory/qa-artifacts/review-3/`.
 
-## Run and deploy
+## How to reproduce
 
 ```sh
 npm ci
 npm test
 npm run build
-/opt/fleet/lib/deploy-static.sh recipe-import-repair ./dist
-```
-
-To rerun the browser suite against production:
-
-```sh
 PLAYWRIGHT_BASE_URL=https://recipe-import-repair.sociobot.in npm run test:e2e
 ```
 
-## Known gaps and next steps
+For F-3-1, open the live landing page in a fresh 390 × 844 context, select **Try it with sample data**, and do not scroll. The sample title is at about 2,458 px, the first repair at 1,672 px, and the apply action at 1,517 px.
 
-None. No review finding, claim, or required quality gate remains open.
+For F-3-2, inspect `@claim:format-import` in `tests/e2e/claims.spec.ts`; it asserts only title values and format badges for the three fixtures.
+
+## Next steps
+
+Show a compact named sample and usable repair action in the first mobile demo viewport. Expand the format-import claim test to cover source URL, ingredients, steps, and one editable-field change for each format. Then repeat the full review checklist from scratch.
