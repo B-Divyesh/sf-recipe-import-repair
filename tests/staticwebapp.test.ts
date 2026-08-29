@@ -23,6 +23,11 @@ describe('Azure Static Web Apps routing', () => {
     ]);
     expect(index).toContain('rel="manifest" href="/manifest.webmanifest"');
     expect(notFound).toContain('href="#main"');
+    expect(notFound).toContain('<main id="main" tabindex="-1">');
+    expect(notFound).toContain('rel="canonical"');
+    expect(notFound).toContain('property="og:title"');
+    expect(notFound).toContain('name="twitter:card"');
+    expect(notFound).toContain('rel="apple-touch-icon"');
     expect(notFound).toContain('<nav aria-label="Main navigation">');
     expect(notFound).toContain('href="/privacy"');
     expect(notFound).toContain('href="/terms"');

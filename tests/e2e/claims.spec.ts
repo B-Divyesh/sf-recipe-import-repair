@@ -1,6 +1,13 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+async function readDownload(download: import('@playwright/test').Download): Promise<string> {
+  const stream = await download.createReadStream();
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) chunks.push(Buffer.from(chunk));
+  return Buffer.concat(chunks).toString('utf8');
+}
+
 test('@claim:format-import reads Recipe JSON, JSON-LD, and Markdown into editable recipe fields', async ({ page }) => {
   const fixtures = [
     { format: 'JSON', title: 'Json rice', source: JSON.stringify({ title: 'Json rice', sourceUrl: 'https://example.com/json-rice', ingredients: ['2 cups rice'], steps: ['Cook the rice.'] }) },
@@ -67,7 +74,7 @@ test('@claim:reversible-repairs applies and undoes every suggested repair', asyn
   await expect(page.getByRole('button', { name: 'Undo last change' })).toBeDisabled();
 });
 
-test('Apply N safe repairs composes overlapping changes on the latest ingredient value', async ({ page }) => {
+test('Apply N suggested repairs composes overlapping changes on the latest ingredient value', async ({ page }) => {
   await page.goto('/');
   await page.getByLabel('Paste JSON, JSON-LD, or Markdown').fill(JSON.stringify({
     title: 'Overlapping repairs',
@@ -76,8 +83,8 @@ test('Apply N safe repairs composes overlapping changes on the latest ingredient
   }));
   await page.getByRole('button', { name: 'Inspect recipe' }).click();
 
-  await expect(page.getByRole('button', { name: 'Apply 2 safe repairs' })).toBeVisible();
-  await page.getByRole('button', { name: 'Apply 2 safe repairs' }).click();
+  await expect(page.getByRole('button', { name: 'Apply 2 suggested repairs' })).toBeVisible();
+  await page.getByRole('button', { name: 'Apply 2 suggested repairs' }).click();
 
   await expect(page.locator('#ingredient-0')).toHaveValue('1 1/2 tbsp oil');
   await expect(page.getByText('Ready to export', { exact: true })).toBeVisible();
@@ -103,7 +110,7 @@ test('@claim:repair-diagnostics identifies malformed quantities, verbose units, 
   await expect(page.getByText('No ingredients were found.')).toBeVisible();
   await expect(page.getByText('No steps were found.')).toBeVisible();
   await inspect(JSON.stringify({ title: 'Bad source', sourceUrl: 'ftp://example.com/recipe', ingredients: ['1 cup rice'], steps: ['Cook.'] }));
-  await expect(page.getByText('The source is not a valid web address.')).toBeVisible();
+  await expect(page.getByText('The source URL is not valid.')).toBeVisible();
   await inspect(JSON.stringify({ title: 'T'.repeat(121), ingredients: [`1 cup ${'i'.repeat(215)}`], steps: ['s'.repeat(1001)] }));
   await expect(page.getByText('The title has 121 characters.')).toBeVisible();
   await expect(page.getByText('Ingredient 1 has 221 characters.')).toBeVisible();
@@ -118,7 +125,7 @@ test('@claim:repair-diagnostics identifies malformed quantities, verbose units, 
   await expect(page.getByText('The recipe has no title.')).toBeVisible();
   await expect(page.getByText('Ingredient 1 is empty.')).toBeVisible();
   await expect(page.locator('#ingredient-0-state')).toContainText('Fix needed');
-  await expect(page.getByRole('button', { name: 'Export neutral JSON' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Download selected file' })).toBeDisabled();
   await page.getByRole('button', { name: 'Remove ingredient 1' }).click();
   await expect(page.locator('#ingredient-0')).toHaveCount(0);
   await expect(page.getByText('No ingredients were found.')).toBeVisible();
@@ -152,18 +159,19 @@ test('@claim:exact-change-preview shows before and after for every suggested rep
   }
 });
 
-test('@claim:neutral-export exports repaired JSON with attribution', async ({ page }) => {
+test('@claim:neutral-export exports repair details with attribution, timestamp, and parsed ingredient fields', async ({ page }) => {
   await page.goto('/demo');
-  await page.getByRole('button', { name: 'Apply 3 safe repairs' }).click();
+  await page.getByRole('button', { name: 'Apply 3 suggested repairs' }).click();
   await expect(page.getByText('Ready to export', { exact: true })).toBeVisible();
+  await page.getByLabel('Export format').selectOption('details');
   const downloadPromise = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Export neutral JSON' }).click();
+  await page.getByRole('button', { name: 'Download selected file' }).click();
   const download = await downloadPromise;
-  const stream = await download.createReadStream();
-  const chunks: Buffer[] = [];
-  for await (const chunk of stream) chunks.push(Buffer.from(chunk));
-  const bundle = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+  expect(download.suggestedFilename()).toBe('rosemary-tomato-beans-repair-details.json');
+  const bundle = JSON.parse(await readDownload(download));
   expect(bundle.schemaVersion).toBe('1.0');
+  expect(Number.isNaN(Date.parse(bundle.exportedAt))).toBe(false);
+  expect(new Date(bundle.exportedAt).toISOString()).toBe(bundle.exportedAt);
   expect(bundle.attribution).toEqual({
     sourceUrl: 'https://example.com/mara/rosemary-tomato-beans',
     author: 'Mara Vale',
@@ -176,6 +184,59 @@ test('@claim:neutral-export exports repaired JSON with attribution', async ({ pa
   });
 });
 
+test('@claim:portable-export downloads Recipe JSON-LD and repaired original files that import again', async ({ page }) => {
+  await page.goto('/demo');
+  await page.getByRole('button', { name: 'Apply 3 suggested repairs' }).click();
+  await expect(page.getByLabel('Export format')).toContainText('Recipe JSON-LD');
+  await expect(page.getByText(/Schema.org Recipe fields/)).toBeVisible();
+  const jsonLdDownloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download selected file' }).click();
+  const jsonLdDownload = await jsonLdDownloadPromise;
+  const jsonLd = await readDownload(jsonLdDownload);
+  expect(jsonLdDownload.suggestedFilename()).toBe('rosemary-tomato-beans-recipe-jsonld.json');
+  expect(JSON.parse(jsonLd)).toMatchObject({ '@context': 'https://schema.org', '@type': 'Recipe', name: 'Rosemary tomato beans' });
+
+  await page.goto('/');
+  await page.getByLabel('Paste JSON, JSON-LD, or Markdown').fill(jsonLd);
+  await page.getByRole('button', { name: 'Inspect recipe' }).click();
+  await expect(page.locator('.format-badge')).toHaveText('JSON-LD source');
+  await expect(page.getByLabel(/Title/)).toHaveValue('Rosemary tomato beans');
+
+  const originals = [
+    {
+      format: 'JSON',
+      suffix: 'repaired-json.json',
+      source: JSON.stringify({ title: 'Plain lentils', sourceUrl: 'https://example.com/plain', ingredients: ['2 cups lentils'], steps: ['Simmer.'] }),
+    },
+    {
+      format: 'JSON-LD',
+      suffix: 'repaired-jsonld.json',
+      source: JSON.stringify({ '@context': 'https://schema.org', '@type': 'Recipe', name: 'Linked lentils', url: 'https://example.com/linked', recipeIngredient: ['2 cups lentils'], recipeInstructions: ['Simmer.'] }),
+    },
+    {
+      format: 'Markdown',
+      suffix: 'repaired-markdown.md',
+      source: '# Markdown lentils\n\nSource: https://example.com/markdown\n\n## Ingredients\n- 2 cups lentils\n\n## Steps\n1. Simmer.',
+    },
+  ];
+  for (const fixture of originals) {
+    await page.goto('/');
+    await page.getByLabel('Paste JSON, JSON-LD, or Markdown').fill(fixture.source);
+    await page.getByRole('button', { name: 'Inspect recipe' }).click();
+    await page.getByLabel('Export format').selectOption('original');
+    const originalDownloadPromise = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Download selected file' }).click();
+    const originalDownload = await originalDownloadPromise;
+    const repairedOriginal = await readDownload(originalDownload);
+    expect(originalDownload.suggestedFilename()).toContain(fixture.suffix);
+    await page.goto('/');
+    await page.getByLabel('Paste JSON, JSON-LD, or Markdown').fill(repairedOriginal);
+    await page.getByRole('button', { name: 'Inspect recipe' }).click();
+    await expect(page.locator('.format-badge')).toHaveText(`${fixture.format} source`);
+    await expect(page.getByLabel(/Title/)).toHaveValue(new RegExp('lentils', 'i'));
+  }
+});
+
 test('@claim:demo-sample-issues opens an isolated three-issue sample from the one-click URL', async ({ page }) => {
   await page.goto('/?demo=1');
   await expect(page.getByRole('heading', { level: 1, name: 'Repair this sample recipe' })).toBeVisible();
@@ -183,7 +244,7 @@ test('@claim:demo-sample-issues opens an isolated three-issue sample from the on
   await expect(page.getByLabel(/Title/)).toHaveValue('Rosemary tomato beans');
   await expect(page.locator('.issue [data-repair], .issue button[data-repair]')).toHaveCount(3);
   await expect(page.getByRole('link', { name: 'Leave demo and clear sample' })).toBeVisible();
-  await page.getByRole('button', { name: 'Apply 3 safe repairs' }).click();
+  await page.getByRole('button', { name: 'Apply 3 suggested repairs' }).click();
   await expect(page.locator('.issue button[data-repair]')).toHaveCount(0);
   await page.getByRole('button', { name: 'Reset demo' }).click();
   await expect(page.locator('.issue button[data-repair]')).toHaveCount(3);
@@ -193,7 +254,7 @@ test('@claim:local-only sends no recipe data to another origin', async ({ page }
   const requests: string[] = [];
   page.on('request', (request) => requests.push(request.url()));
   await page.goto('/demo');
-  await page.getByRole('button', { name: 'Apply 3 safe repairs' }).click();
+  await page.getByRole('button', { name: 'Apply 3 suggested repairs' }).click();
   await expect(page.getByText('Ready to export', { exact: true })).toBeVisible();
   expect(requests.length).toBeGreaterThan(0);
   expect(requests.every((url) => new URL(url).origin === 'http://127.0.0.1:4173')).toBe(true);
@@ -201,7 +262,7 @@ test('@claim:local-only sends no recipe data to another origin', async ({ page }
 
 test('@claim:demo-isolation keeps sample state out of real storage', async ({ page }) => {
   await page.goto('/demo');
-  await page.getByRole('button', { name: 'Apply 3 safe repairs' }).click();
+  await page.getByRole('button', { name: 'Apply 3 suggested repairs' }).click();
   const demoState = await page.evaluate(() => ({
     localKeys: Object.keys(localStorage),
     sessionKeys: Object.keys(sessionStorage),
@@ -238,8 +299,8 @@ test('@claim:file-limit rejects recipe files larger than 2 MB', async ({ page })
 
 test('@claim:free-flow completes without an account or payment', async ({ page }) => {
   await page.goto('/demo');
-  await page.getByRole('button', { name: 'Apply 3 safe repairs' }).click();
-  await expect(page.getByRole('button', { name: 'Export neutral JSON' })).toBeEnabled();
+  await page.getByRole('button', { name: 'Apply 3 suggested repairs' }).click();
+  await expect(page.getByRole('button', { name: 'Download selected file' })).toBeEnabled();
   await expect(page.getByText(/sign in|buy|payment/i)).toHaveCount(0);
 });
 
@@ -247,29 +308,26 @@ test('@claim:source-url-no-fetch preserves the source URL without requesting it'
   const requests: string[] = [];
   page.on('request', (request) => requests.push(request.url()));
   await page.goto('/demo');
-  await page.getByRole('button', { name: 'Apply 3 safe repairs' }).click();
+  await page.getByRole('button', { name: 'Apply 3 suggested repairs' }).click();
   const downloadPromise = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Export neutral JSON' }).click();
+  await page.getByRole('button', { name: 'Download selected file' }).click();
   const download = await downloadPromise;
-  const stream = await download.createReadStream();
-  const chunks: Buffer[] = [];
-  for await (const chunk of stream) chunks.push(Buffer.from(chunk));
-  const bundle = JSON.parse(Buffer.concat(chunks).toString('utf8'));
-  expect(bundle.attribution.sourceUrl).toBe('https://example.com/mara/rosemary-tomato-beans');
+  const exported = JSON.parse(await readDownload(download));
+  expect(exported.url).toBe('https://example.com/mara/rosemary-tomato-beans');
   expect(requests.some((url) => new URL(url).origin === 'https://example.com')).toBe(false);
 });
 
 test('@claim:instructions-unchanged leaves cooking instructions byte-for-byte unchanged', async ({ page }) => {
   await page.goto('/demo');
   const before = await page.locator('[data-field^="step-"]').evaluateAll((fields) => fields.map((field) => (field as HTMLTextAreaElement).value));
-  await page.getByRole('button', { name: 'Apply 3 safe repairs' }).click();
+  await page.getByRole('button', { name: 'Apply 3 suggested repairs' }).click();
   const after = await page.locator('[data-field^="step-"]').evaluateAll((fields) => fields.map((field) => (field as HTMLTextAreaElement).value));
   expect(after).toEqual(before);
 });
 
 test('keyboard repair keeps focus on Undo last change after the workbench rerenders', async ({ page }) => {
   await page.goto('/demo');
-  await page.getByRole('button', { name: 'Apply 3 safe repairs' }).focus();
+  await page.getByRole('button', { name: 'Apply 3 suggested repairs' }).focus();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('button', { name: 'Undo last change' })).toBeFocused();
   await expect(page.getByText('Ready to export', { exact: true })).toBeVisible();
@@ -294,18 +352,74 @@ test('file pickers have a visible proxy focus and field edits retain tab positio
 });
 
 test('pages meet the automated accessibility baseline', async ({ page }) => {
-  for (const path of ['/', '/demo', '/privacy', '/terms', '/missing-page']) {
+  for (const path of ['/', '/demo', '/privacy', '/terms', '/404.html']) {
     await page.goto(path);
     await expect(page.locator('h1')).toHaveCount(1);
     const results = await new AxeBuilder({ page }).analyze();
-    expect(results.violations.filter((item) => ['serious', 'critical'].includes(item.impact ?? ''))).toEqual([]);
+    expect(results.violations).toEqual([]);
   }
   await page.emulateMedia({ colorScheme: 'dark' });
   for (const path of ['/', '/demo', '/privacy', '/terms']) {
     await page.goto(path);
     const darkResults = await new AxeBuilder({ page }).analyze();
-    expect(darkResults.violations.filter((item) => ['serious', 'critical'].includes(item.impact ?? ''))).toEqual([]);
+    expect(darkResults.violations).toEqual([]);
   }
+});
+
+test('history restores scroll and focus, and cross-route section links focus their heading', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(() => window.scrollTo({ top: 1200, behavior: 'instant' }));
+  const savedScroll = await page.evaluate(() => window.scrollY);
+  expect(savedScroll).toBeGreaterThan(500);
+  await page.locator('.site-header a[href="/privacy"]').evaluate((link: HTMLAnchorElement) => link.click());
+  await expect(page).toHaveURL(/\/privacy$/);
+  await expect(page.getByRole('heading', { level: 1, name: 'Privacy in plain words' })).toBeFocused();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole('heading', { level: 1, name: 'Fix broken recipe imports before saving' })).toBeFocused();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(savedScroll);
+
+  await page.goto('/privacy');
+  await page.getByRole('link', { name: 'How it works' }).click();
+  await expect(page).toHaveURL(/\/#how-it-works$/);
+  await expect(page.getByRole('heading', { level: 2, name: 'Repair a recipe in three steps' })).toBeFocused();
+});
+
+test('every route updates title, description, canonical, and social metadata', async ({ page }) => {
+  const routes = [
+    ['/', 'Recipe Import Repair — fix recipe import files', 'https://recipe-import-repair.sociobot.in/'],
+    ['/demo', 'Demo — Recipe Import Repair', 'https://recipe-import-repair.sociobot.in/demo'],
+    ['/privacy', 'Privacy — Recipe Import Repair', 'https://recipe-import-repair.sociobot.in/privacy'],
+    ['/terms', 'Terms — Recipe Import Repair', 'https://recipe-import-repair.sociobot.in/terms'],
+  ];
+  for (const [path, title, canonical] of routes) {
+    await page.goto(path);
+    await expect(page).toHaveTitle(title);
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /.+/);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', canonical);
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', title);
+    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content', canonical);
+    await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute('content', title);
+  }
+});
+
+test('the static 404 skip link reaches its main content', async ({ page }) => {
+  await page.goto('/404.html');
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: 'Skip to main content' })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('main')).toBeFocused();
+});
+
+test('the mobile first screen states the job, audience, action, and three facts', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 1, name: 'Fix broken recipe imports before saving' })).toBeVisible();
+  await expect(page.getByText('For people who run their own recipe app and need to fix a file before importing it.')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Try it with sample data' })).toBeVisible();
+  await expect(page.locator('.facts li')).toHaveCount(3);
+  const factsBox = await page.locator('.facts').boundingBox();
+  expect(factsBox!.y + factsBox!.height).toBeLessThanOrEqual(844);
 });
 
 test('mobile layout has no horizontal overflow', async ({ page }) => {

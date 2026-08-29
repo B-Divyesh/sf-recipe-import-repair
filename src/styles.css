@@ -153,9 +153,12 @@ summary { display: inline-flex; min-height: 44px; align-items: center; color: va
 .remove-line { min-height: 44px; padding: 4px; font-size: 0.78rem; }
 .add-line { justify-self: start; }
 .export-strip { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 30px; padding: 18px; border: 2px solid var(--ink); background: var(--blue-wash); }
-.export-strip div { display: grid; }
+.export-strip div { display: grid; gap: 6px; }
 .export-strip span { color: #33464a; font-size: 0.82rem; }
 .export-button { background: var(--leaf); color: #fff; }
+.export-copy label { font-size: 0.82rem; font-weight: 800; }
+.export-copy select { min-height: 44px; max-width: 32rem; padding: 8px 36px 8px 10px; border: 2px solid var(--ink); border-radius: 2px; background: var(--paper-raised); color: var(--ink); font: inherit; }
+.export-copy select:focus-visible { outline: 3px solid var(--proof); outline-offset: 3px; }
 .repair-log { margin-top: 18px; }
 .repair-log ol { margin-bottom: 0; }
 
@@ -245,7 +248,7 @@ summary { display: inline-flex; min-height: 44px; align-items: center; color: va
   .button.primary, .proof-button, .export-button { color: #102023; }
   .demo-strip { background: #4a3c1e; color: #fff6dd; }
   .parse-error { color: #ffe8e2; }
-  .source-text, .field input, .field textarea, .line-field input, .line-field textarea { border-color: #9ba8aa; background: #182124; color: #f2eddf; }
+  .source-text, .field input, .field textarea, .line-field input, .line-field textarea, .export-copy select { border-color: #9ba8aa; background: #182124; color: #f2eddf; }
   .export-strip span { color: #d4e8e8; }
   .facts li span { color: var(--blue-strong); }
   .hero-art img { filter: brightness(0.82) saturate(0.88); }

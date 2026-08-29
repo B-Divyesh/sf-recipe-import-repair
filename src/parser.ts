@@ -52,6 +52,13 @@ export interface NeutralBundle {
   attribution: { sourceUrl: string; author: string };
 }
 
+export interface ExportedRecipeFile {
+  content: string;
+  extension: 'json' | 'md';
+  mimeType: 'application/ld+json' | 'application/json' | 'text/markdown';
+  suffix: 'recipe-jsonld' | 'repaired-json' | 'repaired-jsonld' | 'repaired-markdown' | 'repair-details';
+}
+
 const canonicalUnits: Record<string, string> = {
   tablespoon: 'tbsp', tablespoons: 'tbsp', tbsp: 'tbsp', tbs: 'tbsp',
   teaspoon: 'tsp', teaspoons: 'tsp', tsp: 'tsp',
@@ -91,7 +98,10 @@ export function normalizeFractions(value: string): string {
 function readText(value: unknown): string {
   if (typeof value === 'string') return value.trim();
   if (typeof value === 'number') return String(value);
-  if (value && typeof value === 'object' && 'name' in value) return readText((value as { name: unknown }).name);
+  if (value && typeof value === 'object') {
+    const object = value as Record<string, unknown>;
+    return readText(object.raw ?? object.text ?? object.name);
+  }
   return '';
 }
 
@@ -122,7 +132,11 @@ function findRecipeNode(value: unknown): Record<string, unknown> {
     const type = entry['@type'];
     return type === 'Recipe' || (Array.isArray(type) && type.includes('Recipe'));
   });
-  return recipe ?? object;
+  if (recipe) return recipe;
+  if (object.recipe && typeof object.recipe === 'object' && !Array.isArray(object.recipe)) {
+    return object.recipe as Record<string, unknown>;
+  }
+  return object;
 }
 
 function parseJson(source: string): { format: InputFormat; recipe: Recipe } {
@@ -130,7 +144,7 @@ function parseJson(source: string): { format: InputFormat; recipe: Recipe } {
   try {
     value = JSON.parse(source);
   } catch {
-    throw new Error('The JSON could not be read. Fix the marked punctuation and try again.');
+    throw new Error('The JSON has invalid punctuation. Check its commas, quotes, and brackets, then inspect it again.');
   }
   const node = findRecipeNode(value);
   const ingredientsValue = node.recipeIngredient ?? node.ingredients ?? [];
@@ -236,7 +250,7 @@ export function inspectRecipe(recipe: Recipe): Issue[] {
       const url = new URL(recipe.sourceUrl);
       if (!['http:', 'https:'].includes(url.protocol)) throw new Error();
     } catch {
-      issues.push(issue('bad-source', 'error', 'sourceUrl', 'The source is not a valid web address.', 'Enter a full address starting with http:// or https://.'));
+      issues.push(issue('bad-source', 'error', 'sourceUrl', 'The source URL is not valid.', 'Enter a full source URL starting with http:// or https://.'));
     }
   }
 
@@ -311,6 +325,76 @@ export function createNeutralBundle(recipe: Recipe, exportedAt = new Date().toIS
     recipe: { ...cleanRecipe, ingredients },
     attribution: { sourceUrl: recipe.sourceUrl, author: recipe.author },
   };
+}
+
+function jsonText(value: unknown): string {
+  return `${JSON.stringify(value, null, 2)}\n`;
+}
+
+export function createJsonLd(recipe: Recipe): Record<string, unknown> {
+  const jsonLd: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Recipe',
+    name: recipe.title,
+    recipeIngredient: recipe.ingredients.map((ingredient) => ingredient.raw),
+    recipeInstructions: recipe.steps.map((step) => ({ '@type': 'HowToStep', text: step })),
+  };
+  if (recipe.description) jsonLd.description = recipe.description;
+  if (recipe.author) jsonLd.author = recipe.author;
+  if (recipe.sourceUrl) jsonLd.url = recipe.sourceUrl;
+  if (recipe.servings) jsonLd.recipeYield = recipe.servings;
+  if (recipe.prepTime) jsonLd.prepTime = recipe.prepTime;
+  if (recipe.cookTime) jsonLd.cookTime = recipe.cookTime;
+  return jsonLd;
+}
+
+function createPlainJson(recipe: Recipe): Record<string, unknown> {
+  return {
+    title: recipe.title,
+    description: recipe.description,
+    servings: recipe.servings,
+    prepTime: recipe.prepTime,
+    cookTime: recipe.cookTime,
+    sourceUrl: recipe.sourceUrl,
+    author: recipe.author,
+    ingredients: recipe.ingredients.map((ingredient) => ingredient.raw),
+    steps: [...recipe.steps],
+  };
+}
+
+function createMarkdown(recipe: Recipe): string {
+  const metadata = [
+    recipe.sourceUrl ? `Source: ${recipe.sourceUrl}` : '',
+    recipe.author ? `Author: ${recipe.author}` : '',
+    recipe.servings ? `Servings: ${recipe.servings}` : '',
+    recipe.prepTime ? `Prep time: ${recipe.prepTime}` : '',
+    recipe.cookTime ? `Cook time: ${recipe.cookTime}` : '',
+  ].filter(Boolean);
+  return [
+    `# ${recipe.title}`,
+    recipe.description,
+    ...metadata,
+    '## Ingredients',
+    ...recipe.ingredients.map((ingredient) => `- ${ingredient.raw}`),
+    '## Steps',
+    ...recipe.steps.map((step, index) => `${index + 1}. ${step}`),
+  ].filter((line, index, lines) => line || (index > 0 && lines[index - 1] !== '')).join('\n\n').replace(/\n{3,}/g, '\n\n') + '\n';
+}
+
+export function createExportFile(recipe: Recipe, exportFormat: 'jsonld' | 'original' | 'details', inputFormat: InputFormat): ExportedRecipeFile {
+  if (exportFormat === 'jsonld') {
+    return { content: jsonText(createJsonLd(recipe)), extension: 'json', mimeType: 'application/ld+json', suffix: 'recipe-jsonld' };
+  }
+  if (exportFormat === 'details') {
+    return { content: jsonText(createNeutralBundle(recipe)), extension: 'json', mimeType: 'application/json', suffix: 'repair-details' };
+  }
+  if (inputFormat === 'Markdown') {
+    return { content: createMarkdown(recipe), extension: 'md', mimeType: 'text/markdown', suffix: 'repaired-markdown' };
+  }
+  if (inputFormat === 'JSON-LD') {
+    return { content: jsonText(createJsonLd(recipe)), extension: 'json', mimeType: 'application/ld+json', suffix: 'repaired-jsonld' };
+  }
+  return { content: jsonText(createPlainJson(recipe)), extension: 'json', mimeType: 'application/json', suffix: 'repaired-json' };
 }
 
 export function canExport(recipe: Recipe): boolean {

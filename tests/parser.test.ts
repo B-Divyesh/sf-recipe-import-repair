@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canExport, createNeutralBundle, inspectRecipe, parseRecipe } from '../src/parser';
+import { canExport, createExportFile, createNeutralBundle, inspectRecipe, parseRecipe } from '../src/parser';
 
 describe('recipe parser', () => {
   it('reads JSON-LD recipes and nested HowToStep values', () => {
@@ -34,7 +34,22 @@ Author: Mara Vale
   });
 
   it('reports malformed JSON with a next step', () => {
-    expect(() => parseRecipe('{"name": }')).toThrow(/could not be read.*Fix the marked punctuation/i);
+    expect(() => parseRecipe('{"name": }')).toThrow(/invalid punctuation.*commas, quotes, and brackets/i);
+  });
+
+  it('creates JSON-LD, original-format, and detailed exports that can be read again', () => {
+    const inputs = [
+      JSON.stringify({ title: 'Rice', sourceUrl: 'https://example.com/rice', ingredients: ['1 cup rice'], steps: ['Cook.'] }),
+      JSON.stringify({ '@context': 'https://schema.org', '@type': 'Recipe', name: 'Rice', recipeIngredient: ['1 cup rice'], recipeInstructions: ['Cook.'] }),
+      '# Rice\n\nSource: https://example.com/rice\n\n## Ingredients\n- 1 cup rice\n\n## Steps\n1. Cook.',
+    ];
+    for (const input of inputs) {
+      const parsed = parseRecipe(input);
+      for (const choice of ['jsonld', 'original', 'details'] as const) {
+        const exported = createExportFile(parsed.recipe, choice, parsed.format);
+        expect(parseRecipe(exported.content).recipe.title).toBe('Rice');
+      }
+    }
   });
 
   it('finds repairable fractions, decimals, and verbose units', () => {

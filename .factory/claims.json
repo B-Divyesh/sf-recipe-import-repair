@@ -15,10 +15,17 @@
   },
   {
     "id": "neutral-export",
-    "claim": "Exports neutral JSON with source attribution and parsed ingredient fields",
-    "where": "landing method, export toolbar, README",
+    "claim": "Exports repair-details JSON with an ISO timestamp, source attribution, and parsed ingredient fields",
+    "where": "export format selector, README",
     "test": "npm test -- --grep @claim:neutral-export",
-    "sandbox": "demo data; apply all safe repairs, download JSON, and assert schema, repaired ingredient text, quantity, unit, item, source URL, and author"
+    "sandbox": "demo data; apply all suggested repairs, download repair details, and assert schema, valid ISO timestamp, repaired text, parsed fields, source URL, and author"
+  },
+  {
+    "id": "portable-export",
+    "claim": "Exports Schema.org Recipe JSON-LD and repaired original-format files that can be imported again",
+    "where": "landing method, export format selector, README",
+    "test": "npm test -- --grep @claim:portable-export",
+    "sandbox": "fresh demo; download Recipe JSON-LD and import it again; paste Markdown, export repaired original Markdown, and import it again"
   },
   {
     "id": "demo-sample-issues",
@@ -64,10 +71,10 @@
   },
   {
     "id": "source-url-no-fetch",
-    "claim": "Web addresses are preserved in neutral exports and never fetched",
+    "claim": "Source URLs are preserved in exports and never opened",
     "where": "workbench input note, landing limits, README",
     "test": "npm test -- --grep @claim:source-url-no-fetch",
-    "sandbox": "fresh browser context; repair and export the demo source URL while recording requests, then assert attribution is retained and no request reaches its URL origin"
+    "sandbox": "fresh browser context; repair and export the demo as JSON-LD while recording requests, then assert the source URL is retained and its origin is never requested"
   },
   {
     "id": "instructions-unchanged",
@@ -78,7 +85,7 @@
   },
   {
     "id": "repair-diagnostics",
-    "claim": "Points to malformed quantities, verbose units, missing data, invalid source addresses, and oversized fields",
+    "claim": "Flags malformed quantities, long units, missing data, invalid source URLs, and oversized fields",
     "where": "README",
     "test": "npm test -- --grep @claim:repair-diagnostics",
     "sandbox": "fresh browser context; inspect deterministic demo and JSON fixtures, then blank an edited title and ingredient to assert named diagnostics and disabled export"

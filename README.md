@@ -1,8 +1,10 @@
 # Recipe Import Repair
 
-Recipe Import Repair fixes broken recipe imports before saving them to a recipe keeper. It is for people who move their own recipes between self-hosted apps.
+Recipe Import Repair fixes broken recipe imports before saving them to a recipe app. It is for people who run their own recipe app and need to fix a file before importing it.
 
-Paste Recipe JSON, JSON-LD, or Markdown. The tool separates each field and points to malformed quantities, verbose units, missing data, invalid source addresses, and oversized fields. Each automatic repair shows the exact change and can be undone. A neutral JSON export preserves the source URL and author.
+Paste Recipe JSON, JSON-LD, or Markdown. The tool separates the recipe into editable fields. It flags malformed quantities, long units, missing data, invalid source URLs, and oversized fields. Each suggested repair shows the exact change and can be undone.
+
+Download Schema.org Recipe JSON-LD or a repaired file in the original format. Both downloads can be imported into this tool again. A repair-details JSON download preserves the source URL, author, ISO export time, and parsed ingredient fields.
 
 Recipe text stays in the browser. The app works offline after the first visit. The full repair and export flow is free and needs no account.
 
@@ -42,11 +44,13 @@ npm test -- --grep @claim:neutral-export
 - JSON-LD `Recipe` objects, including recipes inside `@graph`
 - Markdown with a title, Ingredients section, and Steps, Instructions, Directions, or Method section
 
-The tool never fetches a recipe URL or changes cooking instructions.
+The tool never opens a source URL or changes cooking instructions.
 
-## Neutral export shape
+## Export formats
 
-Exports include `schemaVersion`, `exportedAt`, the normalized `recipe`, and an `attribution` object. Ingredient lines keep both their original repaired text and parsed quantity, unit, and item fields.
+- **Recipe JSON-LD** uses Schema.org `Recipe` fields for recipe apps that accept JSON-LD.
+- **Repaired original format** keeps the input as JSON, JSON-LD, or Markdown.
+- **Repair details** includes `schemaVersion`, an ISO `exportedAt` value, the recipe, and attribution. Ingredients include repaired text, quantity, unit, and item fields.
 
 ## Deploy
 

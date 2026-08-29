@@ -2,7 +2,7 @@ import './styles.css';
 import {
   canExport,
   cloneRecipe,
-  createNeutralBundle,
+  createExportFile,
   inspectRecipe,
   parseIngredient,
   parseRecipe,
@@ -38,6 +38,7 @@ const SAMPLE_SOURCE = `{
 
 type Route = 'home' | 'demo' | 'privacy' | 'terms' | 'not-found';
 interface Snapshot { recipe: Recipe; label: string; repairLogLength: number }
+interface RouteState { scrollX: number; scrollY: number; focus: string }
 
 const appRoot = document.querySelector<HTMLDivElement>('#app');
 if (!appRoot) throw new Error('App root is missing.');
@@ -56,6 +57,10 @@ let repairLog: string[] = [];
 let showSource = false;
 let isOffline = !navigator.onLine;
 let pendingFocusSelector = '';
+let exportFormat: 'jsonld' | 'original' | 'details' = 'jsonld';
+
+if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+if (!window.history.state) window.history.replaceState({ scrollX: 0, scrollY: 0, focus: '' } satisfies RouteState, '', window.location.href);
 
 if (isDemo) parseCurrentSource(false);
 
@@ -76,8 +81,8 @@ function getRoute(): Route {
 function routeMeta(current: Route): { title: string; description: string; canonical: string } {
   const base = 'https://recipe-import-repair.sociobot.in';
   const data = {
-    home: ['Recipe Import Repair — fix recipe files locally', 'Inspect broken recipe imports, apply clear repairs, and export a neutral recipe file in your browser.', '/'],
-    demo: ['Demo — Recipe Import Repair', 'Try recipe repair with a broken sample file that never touches your own data.', '/demo'],
+    home: ['Recipe Import Repair — fix recipe import files', 'Inspect and repair JSON, JSON-LD, or Markdown recipe files before importing them into your recipe app.', '/'],
+    demo: ['Demo — Recipe Import Repair', 'Try recipe repair with an isolated sample file, then export Recipe JSON-LD or the repaired source format.', '/demo'],
     privacy: ['Privacy — Recipe Import Repair', 'How Recipe Import Repair handles files and browser data.', '/privacy'],
     terms: ['Terms — Recipe Import Repair', 'Terms for using the free Recipe Import Repair utility.', '/terms'],
     'not-found': ['Page not found — Recipe Import Repair', 'This page does not exist. Return to Recipe Import Repair.', window.location.pathname],
@@ -90,15 +95,49 @@ function updateMeta(): void {
   document.title = meta.title;
   document.querySelector<HTMLMetaElement>('meta[name="description"]')?.setAttribute('content', meta.description);
   document.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.setAttribute('href', meta.canonical);
+  document.querySelector<HTMLMetaElement>('meta[property="og:title"]')?.setAttribute('content', meta.title);
+  document.querySelector<HTMLMetaElement>('meta[property="og:description"]')?.setAttribute('content', meta.description);
+  document.querySelector<HTMLMetaElement>('meta[property="og:url"]')?.setAttribute('content', meta.canonical);
+  document.querySelector<HTMLMetaElement>('meta[name="twitter:title"]')?.setAttribute('content', meta.title);
+  document.querySelector<HTMLMetaElement>('meta[name="twitter:description"]')?.setAttribute('content', meta.description);
 }
 
 function navigate(path: string): void {
-  if (`${window.location.pathname}${window.location.search}` === path) return;
-  window.history.pushState({}, '', path);
-  changeRoute();
+  if (`${window.location.pathname}${window.location.search}${window.location.hash}` === path) return;
+  saveCurrentRouteState();
+  window.history.pushState({ scrollX: 0, scrollY: 0, focus: '' } satisfies RouteState, '', path);
+  changeRoute('push');
 }
 
-function changeRoute(): void {
+function saveCurrentRouteState(): void {
+  const state: RouteState = { scrollX: window.scrollX, scrollY: window.scrollY, focus: focusSelector(document.activeElement) };
+  window.history.replaceState(state, '', window.location.href);
+}
+
+function focusRouteTarget(mode: 'push' | 'pop'): void {
+  const state = (window.history.state ?? {}) as Partial<RouteState>;
+  if (mode === 'pop') {
+    const target = state.focus ? document.querySelector<HTMLElement>(state.focus) : document.querySelector<HTMLHeadingElement>('h1');
+    if (target?.matches('h1, h2, h3, main')) target.setAttribute('tabindex', '-1');
+    target?.focus({ preventScroll: true });
+    window.scrollTo({ left: state.scrollX ?? 0, top: state.scrollY ?? 0, behavior: 'instant' });
+    return;
+  }
+  const hashTarget = window.location.hash ? document.querySelector<HTMLElement>(window.location.hash) : null;
+  if (hashTarget) {
+    const heading = hashTarget.matches('h1, h2, h3') ? hashTarget : hashTarget.querySelector<HTMLElement>('h1, h2, h3');
+    heading?.setAttribute('tabindex', '-1');
+    heading?.focus({ preventScroll: true });
+    hashTarget.scrollIntoView({ block: 'start', behavior: 'instant' });
+    return;
+  }
+  const heading = document.querySelector<HTMLHeadingElement>('h1');
+  heading?.setAttribute('tabindex', '-1');
+  heading?.focus({ preventScroll: true });
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+function changeRoute(mode: 'push' | 'pop' = 'push'): void {
   const wasDemo = isDemo;
   route = getRoute();
   isDemo = route === 'demo';
@@ -113,12 +152,7 @@ function changeRoute(): void {
   }
   updateMeta();
   render();
-  requestAnimationFrame(() => {
-    const heading = document.querySelector<HTMLHeadingElement>('h1');
-    heading?.setAttribute('tabindex', '-1');
-    heading?.focus({ preventScroll: true });
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  });
+  requestAnimationFrame(() => requestAnimationFrame(() => focusRouteTarget(mode)));
 }
 
 function parseCurrentSource(shouldAnnounce = true): void {
@@ -234,12 +268,12 @@ function removeStep(index: number): void {
 }
 
 function exportRecipe(): void {
-  if (!recipe || !canExport(recipe)) return;
-  const bundle = createNeutralBundle(recipe);
-  const blob = new Blob([`${JSON.stringify(bundle, null, 2)}\n`], { type: 'application/json' });
+  if (!recipe || !format || !canExport(recipe)) return;
+  const exported = createExportFile(recipe, exportFormat, format);
+  const blob = new Blob([exported.content], { type: exported.mimeType });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  const filename = `${recipe.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'recipe'}-neutral.json`;
+  const filename = `${recipe.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'recipe'}-${exported.suffix}.${exported.extension}`;
   link.href = url;
   link.download = filename;
   link.click();
@@ -256,7 +290,7 @@ function header(): string {
       <a class="wordmark" href="/" data-nav aria-label="Recipe Import Repair home"><span aria-hidden="true">✓</span> Recipe Import Repair</a>
       <nav aria-label="Main navigation">
         <a href="/demo" data-nav${route === 'demo' ? ' aria-current="page"' : ''}>Demo</a>
-        <a href="/#how-it-works">How it works</a>
+        <a href="/#how-it-works" data-nav>How it works</a>
         <a href="/privacy" data-nav${route === 'privacy' ? ' aria-current="page"' : ''}>Privacy</a>
       </nav>
     </header>`;
@@ -264,7 +298,7 @@ function header(): string {
 
 function footer(): string {
   return `<footer class="site-footer">
-    <div><strong>Recipe Import Repair</strong><p>Fix recipe files before they reach your recipe keeper.</p></div>
+    <div><strong>Recipe Import Repair</strong><p>Fix recipe files before importing them into your recipe app.</p></div>
     <nav aria-label="Footer navigation"><a href="/privacy" data-nav>Privacy</a><a href="/terms" data-nav>Terms</a><a href="https://hello-factory.sociobot.in" target="_blank" rel="noreferrer">Built by Param Factory <span class="sr-only">(opens in a new tab)</span></a></nav>
     <p class="build-note">v1.0.0 · Original generated illustration</p>
   </footer>`;
@@ -285,7 +319,7 @@ function homePage(): string {
       <div class="hero-copy">
         <p class="eyebrow">Repair recipe files in your browser</p>
         <h1 id="home-title">Fix broken recipe imports before saving</h1>
-        <p class="lede">For self-hosted recipe keepers who need clear fixes before an import changes their collection.</p>
+        <p class="lede">For people who run their own recipe app and need to fix a file before importing it.</p>
         <div class="hero-actions">
           <a class="button primary" href="/?demo=1" data-nav>Try it with sample data</a>
           <label class="button secondary file-picker">Choose your file<input id="hero-file" class="file-input" type="file" accept=".json,.jsonld,.md,.markdown,text/markdown,application/json" /></label>
@@ -303,11 +337,11 @@ function homePage(): string {
       ${workbench(false)}
     </section>
     <section id="how-it-works" class="method" aria-labelledby="method-title">
-      <div class="section-intro"><p class="eyebrow">How recipe repair works</p><h2 id="method-title">Repair in three checked steps</h2></div>
+      <div class="section-intro"><p class="eyebrow">How recipe repair works</p><h2 id="method-title">Repair a recipe in three steps</h2></div>
       <ol class="method-list">
         <li><span>01</span><div><h3>Read the file</h3><p>The tool separates title, source, ingredients, and steps.</p></div></li>
         <li><span>02</span><div><h3>Review each repair</h3><p>Every suggested repair shows its exact before and after value.</p></div></li>
-        <li><span>03</span><div><h3>Export a neutral file</h3><p>The export keeps attribution and uses a documented JSON shape.</p></div></li>
+        <li><span>03</span><div><h3>Choose an export format</h3><p>Download Recipe JSON-LD or keep the source file format.</p></div></li>
       </ol>
     </section>
     <section class="boundaries" aria-labelledby="boundaries-title">
@@ -333,7 +367,7 @@ function issueSummary(): string {
 
 function issueList(): string {
   if (!recipe) return '';
-  if (!issues.length) return `<div class="clean-sheet"><span aria-hidden="true">✓</span><div><h3>No issues found</h3><p>This recipe is ready for a neutral export.</p></div></div>`;
+  if (!issues.length) return `<div class="clean-sheet"><span aria-hidden="true">✓</span><div><h3>No issues found</h3><p>Choose a format and download the repaired recipe.</p></div></div>`;
   return `<ol class="issue-list">${issues.map((item) => `<li class="issue ${item.severity}" data-issue="${item.id}">
       <div class="issue-mark" aria-hidden="true">${item.severity === 'error' ? '!' : '?'}</div>
       <div class="issue-copy"><p><strong>${item.severity === 'error' ? 'Fix' : 'Review'}:</strong> ${escapeHtml(item.message)}</p><p>${escapeHtml(item.next)}</p>
@@ -379,7 +413,7 @@ function workbench(expanded: boolean): string {
       <div class="format-badge">${format ? `${format} source` : 'No file read'}</div>
       <div class="toolbar-actions">
         ${recipe ? `<button class="text-button" data-action="toggle-source">${showSource ? 'Hide source' : 'Show source'}</button>` : ''}
-        <button class="text-button" data-action="clear">Clear bench</button>
+        <button class="text-button" data-action="clear" ${source || recipe ? '' : 'disabled'}>Clear recipe and results</button>
       </div>
     </div>
     ${notice ? `<div class="sr-only" aria-live="polite">${escapeHtml(notice)}</div>` : ''}
@@ -388,14 +422,14 @@ function workbench(expanded: boolean): string {
         <div class="panel-heading"><div><p class="step-label">Input</p><${panelHeading}>Recipe source</${panelHeading}></div><label class="file-label file-picker">Choose file<input id="${expanded ? 'demo' : 'bench-home'}-file" class="file-input" type="file" accept=".json,.jsonld,.md,.markdown,text/markdown,application/json" /></label></div>
         <label class="source-label" for="source-text">Paste JSON, JSON-LD, or Markdown</label>
         <textarea id="source-text" class="source-text" rows="${expanded ? '15' : '10'}" spellcheck="false" placeholder="# Tomato beans&#10;&#10;## Ingredients&#10;- 2 cups beans&#10;&#10;## Steps&#10;1. Warm the beans.">${escapeHtml(source)}</textarea>
-        <p class="input-help">Maximum file size: 2 MB. Web addresses are preserved and never fetched.</p>
+        <p class="input-help">Maximum file size: 2 MB. Source URLs are preserved and never opened.</p>
         <button class="button primary full-button" data-action="inspect">Inspect recipe</button>
         ${errorMessage ? `<div class="parse-error" role="alert"><strong>Source not read</strong><p>${escapeHtml(errorMessage)}</p></div>` : ''}
         ${showSource && recipe ? `<pre class="raw-source" tabindex="0"><code>${escapeHtml(source)}</code></pre>` : ''}
       </div>
       <div class="result-panel">
         <div class="panel-heading result-heading"><div><p class="step-label">Inspection</p><${panelHeading}>Parsed recipe</${panelHeading}></div>${recipe ? issueSummary() : ''}</div>
-        ${recipe ? `<div class="issue-actions"><button class="button proof-button" data-action="apply-all" ${availableRepairs ? '' : 'disabled'}>Apply ${availableRepairs} safe ${availableRepairs === 1 ? 'repair' : 'repairs'}</button><button class="button secondary" data-action="undo" ${editHistory.length ? '' : 'disabled'}>Undo last change</button></div>${issueList()}${editor()}<div class="export-strip"><div><strong>Neutral recipe JSON</strong><span>${canExport(recipe) ? 'Ready for another recipe keeper.' : 'Fix blocking issues before export.'}</span></div><button class="button export-button" data-action="export" ${canExport(recipe) ? '' : 'disabled'}>Export neutral JSON</button></div>${repairLog.length ? `<details class="repair-log"><summary>Repair log (${repairLog.length})</summary><ol>${repairLog.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ol></details>` : ''}` : `<div class="empty-sheet"><span aria-hidden="true">↳</span><h3>Your parsed fields will appear here</h3><p>Paste recipe text or choose a file. Then inspect it.</p></div>`}
+        ${recipe ? `<div class="issue-actions"><button class="button proof-button" data-action="apply-all" ${availableRepairs ? '' : 'disabled'}>Apply ${availableRepairs} suggested ${availableRepairs === 1 ? 'repair' : 'repairs'}</button><button class="button secondary" data-action="undo" ${editHistory.length ? '' : 'disabled'}>Undo last change</button></div>${issueList()}${editor()}<div class="export-strip"><div class="export-copy"><strong>Download repaired recipe</strong><label for="export-format">Export format</label><select id="export-format" data-export-format><option value="jsonld"${exportFormat === 'jsonld' ? ' selected' : ''}>Recipe JSON-LD (.json)</option><option value="original"${exportFormat === 'original' ? ' selected' : ''}>Repaired original format (${format})</option><option value="details"${exportFormat === 'details' ? ' selected' : ''}>Repair details (.json)</option></select><span>Recipe JSON-LD uses Schema.org Recipe fields. Repaired original keeps this file's ${format} format.</span>${canExport(recipe) ? '' : '<span>Fix blocking issues before export.</span>'}</div><button class="button export-button" data-action="export" ${canExport(recipe) ? '' : 'disabled'}>Download selected file</button></div>${repairLog.length ? `<details class="repair-log"><summary>Repair log (${repairLog.length})</summary><ol>${repairLog.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ol></details>` : ''}` : `<div class="empty-sheet"><span aria-hidden="true">↳</span><h3>Your parsed fields will appear here</h3><p>Paste recipe text or choose a file. Then inspect it.</p></div>`}
       </div>
     </div>
   </section>`;
@@ -453,7 +487,7 @@ app.addEventListener('click', (event) => {
   const nav = target.closest<HTMLAnchorElement>('a[data-nav]');
   if (nav && nav.origin === window.location.origin) {
     event.preventDefault();
-    navigate(`${nav.pathname}${nav.search}`);
+    navigate(`${nav.pathname}${nav.search}${nav.hash}`);
     return;
   }
   const repairButton = target.closest<HTMLButtonElement>('[data-repair]');
@@ -476,7 +510,7 @@ app.addEventListener('click', (event) => {
   else if (action === 'toggle-source') { showSource = !showSource; render(); }
   else if (action === 'reset-demo') { resetDemo(); notice = 'Demo reset to the original sample.'; render(); }
   else if (action === 'clear') {
-    source = ''; recipe = null; format = null; issues = []; errorMessage = ''; editHistory = []; repairLog = []; notice = 'Bench cleared.'; render();
+    source = ''; recipe = null; format = null; issues = []; errorMessage = ''; editHistory = []; repairLog = []; notice = 'Recipe and results cleared.'; render();
   } else if (action === 'remove-ingredient') removeIngredient(Number(button.dataset.index));
   else if (action === 'remove-step') removeStep(Number(button.dataset.index));
   else if (action === 'add-ingredient' && recipe) {
@@ -492,6 +526,10 @@ app.addEventListener('click', (event) => {
 
 app.addEventListener('change', async (event) => {
   const target = event.target as HTMLInputElement | HTMLTextAreaElement;
+  if (target instanceof HTMLSelectElement && target.dataset.exportFormat !== undefined) {
+    exportFormat = target.value as typeof exportFormat;
+    return;
+  }
   if (target.type === 'file' && target instanceof HTMLInputElement && target.files?.[0]) {
     const file = target.files[0];
     if (file.size > 2 * 1024 * 1024) {
@@ -513,7 +551,7 @@ app.addEventListener('change', async (event) => {
   }
 });
 
-window.addEventListener('popstate', changeRoute);
+window.addEventListener('popstate', () => changeRoute('pop'));
 window.addEventListener('online', () => { isOffline = false; render(); });
 window.addEventListener('offline', () => { isOffline = true; render(); });
 

@@ -1,4 +1,4 @@
-const CACHE = 'recipe-repair-v1';
+const CACHE = 'recipe-repair-v2';
 const SHELL = ['/', '/demo', '/privacy', '/terms', '/favicon.svg', '/apple-touch-icon.png', '/assets/repair-workbench.webp'];
 
 self.addEventListener('install', (event) => {
