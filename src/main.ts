@@ -281,7 +281,7 @@ function factList(): string {
 function homePage(): string {
   return `<main id="main">
     <section class="hero" aria-labelledby="home-title">
-      <div class="margin-note" aria-hidden="true">FIELD NOTE 01<br>CHECK BEFORE IMPORT</div>
+      <div class="margin-note" aria-hidden="true">CHECK<br>BEFORE IMPORT</div>
       <div class="hero-copy">
         <p class="eyebrow">Repair recipe files in your browser</p>
         <h1 id="home-title">Fix broken recipe imports before saving</h1>
@@ -306,7 +306,7 @@ function homePage(): string {
       <div class="section-intro"><p class="eyebrow">How recipe repair works</p><h2 id="method-title">Repair in three checked steps</h2></div>
       <ol class="method-list">
         <li><span>01</span><div><h3>Read the file</h3><p>The tool separates title, source, ingredients, and steps.</p></div></li>
-        <li><span>02</span><div><h3>Review each mark</h3><p>Every suggested repair shows its exact before and after value.</p></div></li>
+        <li><span>02</span><div><h3>Review each repair</h3><p>Every suggested repair shows its exact before and after value.</p></div></li>
         <li><span>03</span><div><h3>Export a neutral file</h3><p>The export keeps attribution and uses a documented JSON shape.</p></div></li>
       </ol>
     </section>

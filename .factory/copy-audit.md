@@ -34,6 +34,7 @@ The first screen states the job, the audience, and the first action in one breat
 | Paste recipe text or choose a file. | 7 | Pass |
 | Then inspect it. | 3 | Pass |
 | Repair in three checked steps | 5 | Pass |
+| Review each repair | 3 | Pass |
 | The tool separates title, source, ingredients, and steps. | 8 | Pass |
 | Every suggested repair shows its exact before and after value. | 10 | Pass |
 | The export keeps attribution and uses a documented JSON shape. | 10 | Pass |
