@@ -183,6 +183,10 @@ test('@claim:demo-sample-issues opens an isolated three-issue sample from the on
   await expect(page.getByLabel(/Title/)).toHaveValue('Rosemary tomato beans');
   await expect(page.locator('.issue [data-repair], .issue button[data-repair]')).toHaveCount(3);
   await expect(page.getByRole('link', { name: 'Leave demo and clear sample' })).toBeVisible();
+  await page.getByRole('button', { name: 'Apply 3 safe repairs' }).click();
+  await expect(page.locator('.issue button[data-repair]')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Reset demo' }).click();
+  await expect(page.locator('.issue button[data-repair]')).toHaveCount(3);
 });
 
 test('@claim:local-only sends no recipe data to another origin', async ({ page }) => {
