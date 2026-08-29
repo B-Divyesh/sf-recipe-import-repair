@@ -1,3 +1,27 @@
+# Review 2 handoff — FAIL
+
+- Work order: `recipe-import-repair-review-2`
+- Base reviewed: `2a8eb27b75f9b2a9ca95cddfbef4b8ab06d057ea`
+- Live URL: <https://recipe-import-repair.sociobot.in>
+- Date: 2026-08-29 UTC
+- Product code changed: no
+
+## Completed work
+
+- Wrote `.factory/review-2.md` with a fresh mobile/desktop first read, complete landing/README copy audit, one-click demo and storage isolation checks, claim cross-check, historical finding verification, route/metadata/link/accessibility checks, and missed-leverage assessment.
+- Ran every one of the 13 commands in `.factory/claims.json` independently from a clean clone; all passed.
+- Ran the clean clone's full `npm test`, typecheck, lint, and production build; all passed. The live JavaScript hash matches the clean build.
+
+## Result and next steps
+
+The verdict is **FAIL** with 3 blocking and 9 minor findings. The primary blockers are the custom export's lack of a demonstrated import destination, broken scroll/focus history behavior, and the dead skip link on the live 404. Exact evidence and concrete fixes are in `.factory/review-2.md`.
+
+After repair, rerun all manifest commands from a clean clone plus the full live demo/storage/request, route, link, metadata, and Axe checks described in the report.
+
+---
+
+# Historical handoffs
+
 # Polish 1 handoff — PASS
 
 - Work order: `recipe-import-repair-polish-1`
