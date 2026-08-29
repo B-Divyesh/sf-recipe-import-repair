@@ -33,4 +33,27 @@ describe('Azure Static Web Apps routing', () => {
     expect(notFound).toContain('href="/terms"');
     expect(notFound).toContain('Built by Param Factory');
   });
+
+  test('keeps reviewed copy direct and every retained export promise in the claims manifest', async () => {
+    const [main, parser, readme, catalog, claimsText] = await Promise.all([
+      readFile(resolve('src/main.ts'), 'utf8'),
+      readFile(resolve('src/parser.ts'), 'utf8'),
+      readFile(resolve('README.md'), 'utf8'),
+      readFile(resolve('.factory/catalog-description.txt'), 'utf8'),
+      readFile(resolve('.factory/claims.json'), 'utf8'),
+    ]);
+    for (const removed of ['Clear bench', 'self-hosted recipe keepers', 'three checked steps', 'safe repairs', 'Ready for another recipe keeper', 'Web addresses']) {
+      expect(main).not.toContain(removed);
+    }
+    expect(main).toContain('Clear recipe and results');
+    expect(main).toContain('Apply ${availableRepairs} suggested');
+    expect(parser).toContain('Check its commas, quotes, and brackets');
+    expect(readme).toContain('The tool separates the recipe into editable fields. It flags malformed quantities');
+    expect(readme).not.toMatch(/self-hosted|source addresses|recipe URL|Neutral export shape/);
+    const claims = JSON.parse(claimsText) as Array<{ id: string; claim: string }>;
+    expect(claims.find((claim) => claim.id === 'portable-export')?.claim).toContain('Recipe JSON-LD');
+    expect(claims.find((claim) => claim.id === 'neutral-export')?.claim).toContain('ISO timestamp');
+    expect(catalog.trim()).toMatch(/^(Repair|Fix)\b/);
+    expect(catalog.trim().length).toBeLessThanOrEqual(120);
+  });
 });

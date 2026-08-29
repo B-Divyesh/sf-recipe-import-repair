@@ -254,10 +254,11 @@ test('@claim:local-only sends no recipe data to another origin', async ({ page }
   const requests: string[] = [];
   page.on('request', (request) => requests.push(request.url()));
   await page.goto('/demo');
+  const productOrigin = new URL(page.url()).origin;
   await page.getByRole('button', { name: 'Apply 3 suggested repairs' }).click();
   await expect(page.getByText('Ready to export', { exact: true })).toBeVisible();
   expect(requests.length).toBeGreaterThan(0);
-  expect(requests.every((url) => new URL(url).origin === 'http://127.0.0.1:4173')).toBe(true);
+  expect(requests.every((url) => new URL(url).origin === productOrigin)).toBe(true);
 });
 
 test('@claim:demo-isolation keeps sample state out of real storage', async ({ page }) => {
@@ -333,6 +334,21 @@ test('keyboard repair keeps focus on Undo last change after the workbench rerend
   await expect(page.getByText('Ready to export', { exact: true })).toBeVisible();
 });
 
+test('reviewed wording and destructive controls name their exact result', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByText('For people who run their own recipe app and need to fix a file before importing it.')).toBeVisible();
+  await expect(page.getByRole('heading', { level: 2, name: 'Repair a recipe in three steps' })).toBeVisible();
+  await expect(page.getByText('Source URLs are preserved and never opened.')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Clear recipe and results' })).toBeDisabled();
+  await page.getByLabel('Paste JSON, JSON-LD, or Markdown').fill('{"name": }');
+  await page.getByRole('button', { name: 'Inspect recipe' }).click();
+  await expect(page.getByRole('alert')).toContainText('Check its commas, quotes, and brackets, then inspect it again.');
+  await expect(page.getByRole('button', { name: 'Clear recipe and results' })).toBeEnabled();
+  await page.goto('/demo');
+  await expect(page.getByRole('button', { name: 'Apply 3 suggested repairs' })).toBeVisible();
+  await expect(page.getByText(/safe repairs/i)).toHaveCount(0);
+});
+
 test('file pickers have a visible proxy focus and field edits retain tab position', async ({ page }) => {
   await page.goto('/');
   for (const id of ['#hero-file', '#bench-home-file']) {
@@ -352,7 +368,8 @@ test('file pickers have a visible proxy focus and field edits retain tab positio
 });
 
 test('pages meet the automated accessibility baseline', async ({ page }) => {
-  for (const path of ['/', '/demo', '/privacy', '/terms', '/404.html']) {
+  const notFoundPath = process.env.PLAYWRIGHT_BASE_URL ? '/finding-404-polish-2' : '/404.html';
+  for (const path of ['/', '/demo', '/privacy', '/terms', notFoundPath]) {
     await page.goto(path);
     await expect(page.locator('h1')).toHaveCount(1);
     const results = await new AxeBuilder({ page }).analyze();
@@ -404,7 +421,7 @@ test('every route updates title, description, canonical, and social metadata', a
 });
 
 test('the static 404 skip link reaches its main content', async ({ page }) => {
-  await page.goto('/404.html');
+  await page.goto(process.env.PLAYWRIGHT_BASE_URL ? '/finding-404-polish-2' : '/404.html');
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'Skip to main content' })).toBeFocused();
   await page.keyboard.press('Enter');
