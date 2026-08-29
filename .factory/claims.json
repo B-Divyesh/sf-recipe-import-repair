@@ -4,7 +4,7 @@
     "claim": "Reads Recipe JSON, JSON-LD, and Markdown into editable fields",
     "where": "landing workbench, README",
     "test": "npm test -- --grep @claim:format-import",
-    "sandbox": "fresh browser context; paste JSON, JSON-LD, and Markdown fixtures separately and assert each parsed title and source format"
+    "sandbox": "fresh browser context; paste JSON, JSON-LD, and Markdown fixtures separately; assert title, source URL, ingredient, and step fields; edit and retain a title change for each format"
   },
   {
     "id": "reversible-repairs",

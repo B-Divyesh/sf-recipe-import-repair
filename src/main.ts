@@ -353,7 +353,7 @@ function homePage(): string {
 
 function demoPage(): string {
   return `<main id="main" class="demo-main">
-    <section class="demo-heading"><p class="eyebrow">Sample recipe file</p><h1>Repair this sample recipe</h1><p>The sample includes a fraction, a malformed decimal, and a long unit.</p></section>
+    <section class="demo-heading"><p class="eyebrow">Sample recipe file</p><h1>Repair Rosemary tomato beans</h1><p>Review three suggested repairs before you export this sample.</p></section>
     ${workbench(true)}
   </main>`;
 }
@@ -375,6 +375,12 @@ function issueList(): string {
       </div></li>`).join('')}</ol>`;
 }
 
+function demoIssuePreview(): string {
+  const firstIssue = issues[0];
+  if (!firstIssue) return '';
+  return `<p class="demo-issue-preview"><strong>First issue:</strong> ${escapeHtml(firstIssue.message)}</p>`;
+}
+
 function fieldStatus(field: string): string {
   const fieldIssues = issues.filter((item) => item.field === field);
   if (!fieldIssues.length) return '<span class="field-state good">Checked</span>';
@@ -382,11 +388,11 @@ function fieldStatus(field: string): string {
   return `<span class="field-state ${error ? 'bad' : 'review'}">${error ? 'Fix needed' : 'Review'}</span>`;
 }
 
-function editor(): string {
+function editor(includeTitle = true): string {
   if (!recipe) return '';
   return `<div class="recipe-editor">
     <div class="field-grid">
-      <label class="field full"><span>Title ${fieldStatus('title')}</span><input data-field="title" value="${escapeHtml(recipe.title)}" /></label>
+      ${includeTitle ? `<label class="field full"><span>Title ${fieldStatus('title')}</span><input data-field="title" value="${escapeHtml(recipe.title)}" /></label>` : ''}
       <label class="field full"><span>Description ${fieldStatus('description')}</span><textarea data-field="description" rows="2">${escapeHtml(recipe.description)}</textarea></label>
       <label class="field"><span>Servings ${fieldStatus('servings')}</span><input data-field="servings" value="${escapeHtml(recipe.servings)}" /></label>
       <label class="field"><span>Author ${fieldStatus('author')}</span><input data-field="author" value="${escapeHtml(recipe.author)}" /></label>
@@ -429,7 +435,7 @@ function workbench(expanded: boolean): string {
       </div>
       <div class="result-panel">
         <div class="panel-heading result-heading"><div><p class="step-label">Inspection</p><${panelHeading}>Parsed recipe</${panelHeading}></div>${recipe ? issueSummary() : ''}</div>
-        ${recipe ? `<div class="issue-actions"><button class="button proof-button" data-action="apply-all" ${availableRepairs ? '' : 'disabled'}>Apply ${availableRepairs} suggested ${availableRepairs === 1 ? 'repair' : 'repairs'}</button><button class="button secondary" data-action="undo" ${editHistory.length ? '' : 'disabled'}>Undo last change</button></div>${issueList()}${editor()}<div class="export-strip"><div class="export-copy"><strong>Download repaired recipe</strong><label for="export-format">Export format</label><select id="export-format" data-export-format><option value="jsonld"${exportFormat === 'jsonld' ? ' selected' : ''}>Recipe JSON-LD (.json)</option><option value="original"${exportFormat === 'original' ? ' selected' : ''}>Repaired original format (${format})</option><option value="details"${exportFormat === 'details' ? ' selected' : ''}>Repair details (.json)</option></select><span>Recipe JSON-LD uses Schema.org Recipe fields. Repaired original keeps this file's ${format} format.</span>${canExport(recipe) ? '' : '<span>Fix blocking issues before export.</span>'}</div><button class="button export-button" data-action="export" ${canExport(recipe) ? '' : 'disabled'}>Download selected file</button></div>${repairLog.length ? `<details class="repair-log"><summary>Repair log (${repairLog.length})</summary><ol>${repairLog.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ol></details>` : ''}` : `<div class="empty-sheet"><span aria-hidden="true">↳</span><h3>Your parsed fields will appear here</h3><p>Paste recipe text or choose a file. Then inspect it.</p></div>`}
+        ${recipe ? `${expanded ? `<label class="field full demo-title-field"><span>Sample title ${fieldStatus('title')}</span><input id="demo-title" data-field="title" value="${escapeHtml(recipe.title)}" /></label>${demoIssuePreview()}` : ''}<div class="issue-actions"><button class="button proof-button" data-action="apply-all" ${availableRepairs ? '' : 'disabled'}>Apply ${availableRepairs} suggested ${availableRepairs === 1 ? 'repair' : 'repairs'}</button><button class="button secondary" data-action="undo" ${editHistory.length ? '' : 'disabled'}>Undo last change</button></div>${issueList()}${editor(!expanded)}<div class="export-strip"><div class="export-copy"><strong>Download repaired recipe</strong><label for="export-format">Export format</label><select id="export-format" data-export-format><option value="jsonld"${exportFormat === 'jsonld' ? ' selected' : ''}>Recipe JSON-LD (.json)</option><option value="original"${exportFormat === 'original' ? ' selected' : ''}>Repaired original format (${format})</option><option value="details"${exportFormat === 'details' ? ' selected' : ''}>Repair details (.json)</option></select><span>Recipe JSON-LD uses Schema.org Recipe fields. Repaired original keeps this file's ${format} format.</span>${canExport(recipe) ? '' : '<span>Fix blocking issues before export.</span>'}</div><button class="button export-button" data-action="export" ${canExport(recipe) ? '' : 'disabled'}>Download selected file</button></div>${repairLog.length ? `<details class="repair-log"><summary>Repair log (${repairLog.length})</summary><ol>${repairLog.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ol></details>` : ''}` : `<div class="empty-sheet"><span aria-hidden="true">↳</span><h3>Your parsed fields will appear here</h3><p>Paste recipe text or choose a file. Then inspect it.</p></div>`}
       </div>
     </div>
   </section>`;

@@ -1,1 +1,1 @@
-Repair JSON, JSON-LD, and Markdown recipe files before importing them into your recipe app.
+Repair recipe import files before adding them to your recipe app.

@@ -42,8 +42,10 @@ The first screen states the job, audience, and first action in one breath at 390
 | --- | ---: | --- |
 | Demo — sample data, nothing is saved | 6 | Pass — `demo-isolation` |
 | Leaving opens a blank workspace and discards this sample. | 9 | Pass — `demo-isolation` |
-| Repair this sample recipe | 4 | Pass |
-| The sample includes a fraction, a malformed decimal, and a long unit. | 12 | Pass — `demo-sample-issues`, `exact-change-preview` |
+| Repair Rosemary tomato beans | 4 | Pass — named sample in the first demo viewport |
+| Review three suggested repairs before you export this sample. | 9 | Pass — `demo-sample-issues` |
+| Sample title | 2 | Pass — populated editable field in the first demo viewport |
+| First issue: Ingredient 1 uses a Unicode fraction. | 8 | Pass — visible issue in the first demo viewport |
 | Apply 3 suggested repairs | 4 | Pass — no undefined safety claim |
 | Choose a format and download the repaired recipe. | 8 | Pass |
 | Recipe JSON-LD uses Schema.org Recipe fields. | 6 | Pass — `portable-export` |
@@ -91,4 +93,4 @@ Operational installation, testing, build, deployment, license, and format-list s
 | Structured audit download | repair details |
 | Isolated sample workspace | demo |
 
-Catalog description: “Repair JSON, JSON-LD, and Markdown recipe files before importing them into your recipe app.” It starts with a verb and has 91 characters.
+Catalog description: “Repair recipe import files before adding them to your recipe app.” It starts with a verb and has 65 characters.

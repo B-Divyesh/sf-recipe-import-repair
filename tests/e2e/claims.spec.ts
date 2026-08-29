@@ -10,9 +10,9 @@ async function readDownload(download: import('@playwright/test').Download): Prom
 
 test('@claim:format-import reads Recipe JSON, JSON-LD, and Markdown into editable recipe fields', async ({ page }) => {
   const fixtures = [
-    { format: 'JSON', title: 'Json rice', source: JSON.stringify({ title: 'Json rice', sourceUrl: 'https://example.com/json-rice', ingredients: ['2 cups rice'], steps: ['Cook the rice.'] }) },
-    { format: 'JSON-LD', title: 'Linked rice', source: JSON.stringify({ '@context': 'https://schema.org', '@type': 'Recipe', name: 'Linked rice', url: 'https://example.com/linked-rice', recipeIngredient: ['2 cups rice'], recipeInstructions: ['Cook the rice.'] }) },
-    { format: 'Markdown', title: 'Lemon rice', source: `# Lemon rice
+    { format: 'JSON', title: 'Json rice', editedTitle: 'Json rice, edited', sourceUrl: 'https://example.com/json-rice', ingredient: '2 cups rice', step: 'Cook the rice.', source: JSON.stringify({ title: 'Json rice', sourceUrl: 'https://example.com/json-rice', ingredients: ['2 cups rice'], steps: ['Cook the rice.'] }) },
+    { format: 'JSON-LD', title: 'Linked rice', editedTitle: 'Linked rice, edited', sourceUrl: 'https://example.com/linked-rice', ingredient: '2 cups rice', step: 'Cook the rice.', source: JSON.stringify({ '@context': 'https://schema.org', '@type': 'Recipe', name: 'Linked rice', url: 'https://example.com/linked-rice', recipeIngredient: ['2 cups rice'], recipeInstructions: ['Cook the rice.'] }) },
+    { format: 'Markdown', title: 'Lemon rice', editedTitle: 'Lemon rice, edited', sourceUrl: 'https://example.com/lemon-rice', ingredient: '2 cups rice', step: 'Cook the rice.', source: `# Lemon rice
 
 Source: https://example.com/lemon-rice
 
@@ -29,7 +29,13 @@ Source: https://example.com/lemon-rice
     await page.getByLabel('Paste JSON, JSON-LD, or Markdown').fill(fixture.source);
     await page.getByRole('button', { name: 'Inspect recipe' }).click();
     await expect(page.getByLabel(/Title/)).toHaveValue(fixture.title);
+    await expect(page.getByLabel(/Source URL/)).toHaveValue(fixture.sourceUrl);
+    await expect(page.locator('#ingredient-0')).toHaveValue(fixture.ingredient);
+    await expect(page.locator('#step-0')).toHaveValue(fixture.step);
     await expect(page.locator('.format-badge')).toHaveText(`${fixture.format} source`);
+    await page.getByLabel(/Title/).fill(fixture.editedTitle);
+    await page.getByLabel(/Title/).press('Tab');
+    await expect(page.getByLabel(/Title/)).toHaveValue(fixture.editedTitle);
   }
 });
 
@@ -238,15 +244,26 @@ test('@claim:portable-export downloads Recipe JSON-LD and repaired original file
 });
 
 test('@claim:demo-sample-issues opens an isolated three-issue sample from the one-click URL', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/?demo=1');
-  await expect(page.getByRole('heading', { level: 1, name: 'Repair this sample recipe' })).toBeVisible();
+  const viewportBottom = async (selector: string) => page.locator(selector).evaluate((element) => element.getBoundingClientRect().bottom);
+  await expect(page.getByRole('heading', { level: 1, name: 'Repair Rosemary tomato beans' })).toBeVisible();
   await expect(page.getByLabel('Demo mode')).toContainText('Demo — sample data, nothing is saved');
-  await expect(page.getByLabel(/Title/)).toHaveValue('Rosemary tomato beans');
+  await expect(page.getByLabel('Sample title')).toHaveValue('Rosemary tomato beans');
   await expect(page.locator('.issue [data-repair], .issue button[data-repair]')).toHaveCount(3);
+  await expect(page.locator('.demo-issue-preview')).toContainText('Unicode fraction');
   await expect(page.getByRole('link', { name: 'Leave demo and clear sample' })).toBeVisible();
+  expect(await viewportBottom('h1')).toBeLessThanOrEqual(844);
+  expect(await viewportBottom('#demo-title')).toBeLessThanOrEqual(844);
+  expect(await viewportBottom('.demo-issue-preview')).toBeLessThanOrEqual(844);
+  expect(await viewportBottom('[data-action="apply-all"]')).toBeLessThanOrEqual(844);
+  await page.getByLabel('Sample title').fill('Rosemary tomato beans, edited');
+  await page.getByLabel('Sample title').press('Tab');
+  await expect(page.getByLabel('Sample title')).toHaveValue('Rosemary tomato beans, edited');
   await page.getByRole('button', { name: 'Apply 3 suggested repairs' }).click();
   await expect(page.locator('.issue button[data-repair]')).toHaveCount(0);
   await page.getByRole('button', { name: 'Reset demo' }).click();
+  await expect(page.getByLabel('Sample title')).toHaveValue('Rosemary tomato beans');
   await expect(page.locator('.issue button[data-repair]')).toHaveCount(3);
 });
 
@@ -284,7 +301,7 @@ test('@claim:offline-reload reloads the demo without a network', async ({ page, 
   await page.reload();
   await context.setOffline(true);
   await page.reload();
-  await expect(page.getByRole('heading', { level: 1, name: 'Repair this sample recipe' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Repair Rosemary tomato beans' })).toBeVisible();
   await expect(page.getByLabel('Paste JSON, JSON-LD, or Markdown')).toHaveValue(/Rosemary tomato beans/);
 });
 
