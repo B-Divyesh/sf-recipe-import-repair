@@ -1,54 +1,35 @@
-# Polish 3 handoff — PASS
+# Review 4 handoff — FAIL
 
-- Work order: `recipe-import-repair-polish-3-retry1`
-- Product repair commits: `6ffbea418e6184e5301bcc2779ee5919d9b71b3c` and `1d6afa1a8293f01919069882fb34b61edc6358a3`
-- Deployment ID: `601605bc-1e57-4f9c-963a-c16ff0bee939`
+- Work order: `recipe-import-repair-review-4`
+- Reviewed repository head: `c3fb608cc69239e00d33b593fc397da740234faf`
 - Live URL: <https://recipe-import-repair.sociobot.in>
-- Demo URL: <https://recipe-import-repair.sociobot.in/?demo=1>
 - Date: 2026-08-29 UTC
+
+## What was done
+
+Completed a fresh adversarial review at 390 × 844 and 1440 × 900. Wrote `.factory/review-4.md` with the cold-read record, complete landing/README copy audit, demo and storage checks, all claim results, prior-finding verification, structure/accessibility crawl, missed-leverage review, and verdict. No product code was changed.
 
 ## Result
 
-**PASS.** All findings from reviews 1–3 are closed. The mobile demo now proves the product immediately: its initial 390 × 844 screen contains the named Rosemary tomato beans sample, a populated editable title field, a concrete issue, and an enabled apply action, while retaining the isolated-demo banner, reset, and exit controls.
+**FAIL.** Two findings remain:
 
-`@claim:format-import` now proves the full public claim for JSON, JSON-LD, and Markdown: title, source URL, ingredient, step, and a persisted editable-field change for every format.
+- `F-4-1` (blocking): selecting **Choose your file** parses the file but leaves the visitor at the unchanged hero with focus on `<body>`; the result is far below both tested viewports.
+- `F-4-2` (minor): `/privacy` directs visitors to the product repository without linking it.
 
-## What changed
+All findings from reviews 1–3 remain fixed.
 
-- Changed the demo first-screen wording to **Repair Rosemary tomato beans**.
-- Added a compact mobile sample summary before the source editor in both DOM and visual order. It exposes a real sample-title editor, issue preview, count, and repair action without replacing the notebook visual system.
-- Preserved desktop source/result flow, editable recipe fields, source editor, demo isolation, and all earlier repaired behaviors.
-- Expanded the import claim test and its manifest sandbox description.
-- Updated the verb-first catalog description and copy audit.
-- Recorded the complete finding-by-finding map in `.factory/polish-3.md`.
+## Verification
 
-## Verification evidence
+- Fresh clone: `/tmp/recipe-import-repair-review4.y4ofPU/repo` at `c3fb608cc69239e00d33b593fc397da740234faf`.
+- All 14 exact commands in `.factory/claims.json`: passed independently.
+- `npm test`: 10 unit/config tests and 28 Chromium tests passed.
+- `npm run build`: passed; `dist/index.html` exists; JavaScript is 34.73 kB raw / 11.94 kB gzip.
+- Live suite: `PLAYWRIGHT_BASE_URL=https://recipe-import-repair.sociobot.in npm run test:e2e` passed 28/28.
+- URL verifier: Home, Demo, Privacy, and Terms passed with no console/page errors.
+- Live crawl: application routes and assets return 200; an unknown route returns the designed 404; every actual link resolves.
+- Live demo: sample content and repair action fit in the first mobile viewport; Reset, exit, offline reload, separate demo storage, and same-origin-only requests pass.
+- Local/live JavaScript SHA-256 match: `b35319f3004faf3088608e6672c074756525b848f97d45fd42a5d9ac5668d557`.
 
-- Fresh clone: `/tmp/recipe-import-repair-polish3-final.UHDRja/repo` at `1d6afa1`.
-- `npm ci`: passed, zero vulnerabilities.
-- All 14 `.factory/claims.json` commands: passed independently from that fresh clone.
-- Clean full gate: `npm test` passed 10 unit/config and 28 Chromium browser tests; `npm run lint` and `npm run build` passed; `dist/index.html` exists.
-- Live gate: `PLAYWRIGHT_BASE_URL=https://recipe-import-repair.sociobot.in npm run test:e2e` passed 28/28, including the Playwright Axe scans, same-origin privacy capture, service-worker offline reload, real HTTP 404/skip link, route focus/history, and mobile checks.
-- URL verifier: Home, Demo, Privacy, and Terms passed with one h1, `lang=en`, a main landmark, image alt text, labeled buttons, and zero console/page errors. Evidence: `.factory/qa-artifacts/polish-3/live/verify-*/verify.json`.
-- Cold mobile evidence: `.factory/qa-artifacts/polish-3/live/demo-390-cold.png`.
-- Local mobile evidence: `.factory/qa-artifacts/polish-3/local/demo-390.png`.
-- HTTP check: `/`, `/demo`, `/privacy`, and `/terms` returned 200; `/polish-3-not-found` returned 404.
-- Local/live deployed JavaScript SHA-256 match: `b35319f3004faf3088608e6672c074756525b848f97d45fd42a5d9ac5668d557`.
-- Payload: JavaScript 34,730 bytes raw / 11.94 kB gzip; CSS 17,881 bytes raw / 4.76 kB gzip; hero image 60,112 bytes.
-- Live Lighthouse mobile: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 944 ms, LCP 990 ms, TBT 41 ms, CLS 0. Evidence: `.factory/qa-artifacts/polish-3/live/lighthouse-demo-mobile.json`.
+## Next steps
 
-## Run and deploy
-
-```sh
-npm ci
-npm test
-npm run lint
-npm run build
-PLAYWRIGHT_BASE_URL=https://recipe-import-repair.sociobot.in npm run test:e2e
-```
-
-The static deployment is `dist/` through Azure Static Web Apps. The work-order deployment command completed successfully for the ID above; a cold live readback matched the local JavaScript hash.
-
-## Known gaps and next steps
-
-None. The deterministic local repair scope needs no runtime AI service; the product imports, inspects, repairs, undoes, and exports locally without one.
+Fix `F-4-1` and `F-4-2` exactly as described in the review, add browser regressions, deploy, and repeat the complete review checklist.
