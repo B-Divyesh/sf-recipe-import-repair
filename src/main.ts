@@ -175,6 +175,16 @@ function parseCurrentSource(shouldAnnounce = true): void {
   }
 }
 
+function focusVisibleResult(selector: string): void {
+  render();
+  requestAnimationFrame(() => {
+    const target = document.querySelector<HTMLElement>(selector);
+    if (!target) return;
+    target.focus();
+    target.scrollIntoView({ block: 'center', behavior: 'instant' });
+  });
+}
+
 function saveSnapshot(label: string): void {
   if (!recipe) return;
   editHistory.push({ recipe: cloneRecipe(recipe), label, repairLogLength: repairLog.length });
@@ -435,7 +445,7 @@ function workbench(expanded: boolean): string {
         <button class="text-button" data-action="clear" ${source || recipe ? '' : 'disabled'}>Clear recipe and results</button>
       </div>
     </div>
-    ${notice ? `<div class="sr-only" aria-live="polite">${escapeHtml(notice)}</div>` : ''}
+    ${notice && !errorMessage ? `<p id="workbench-status" class="workbench-status" role="status" aria-live="polite" tabindex="-1">${escapeHtml(notice)}</p>` : ''}
     <div class="bench-grid">
       <div class="source-panel">
         <div class="panel-heading"><div><p class="step-label">Input</p><${panelHeading}>Recipe source</${panelHeading}></div><label class="file-label file-picker">Choose file<input id="${expanded ? 'demo' : 'bench-home'}-file" class="file-input" type="file" accept=".json,.jsonld,.md,.markdown,text/markdown,application/json" /></label></div>
@@ -443,7 +453,7 @@ function workbench(expanded: boolean): string {
         <textarea id="source-text" class="source-text" rows="${expanded ? '15' : '10'}" spellcheck="false" placeholder="# Tomato beans&#10;&#10;## Ingredients&#10;- 2 cups beans&#10;&#10;## Steps&#10;1. Warm the beans.">${escapeHtml(source)}</textarea>
         <p class="input-help">Maximum file size: 2 MB. Source URLs are preserved and never opened.</p>
         <button class="button primary full-button" data-action="inspect">Inspect recipe</button>
-        ${errorMessage ? `<div class="parse-error" role="alert"><strong>Source not read</strong><p>${escapeHtml(errorMessage)}</p></div>` : ''}
+        ${errorMessage ? `<div id="source-error" class="parse-error" role="alert" tabindex="-1"><strong>Source not read</strong><p>${escapeHtml(errorMessage)}</p></div>` : ''}
         ${showSource && recipe ? `<pre class="raw-source" tabindex="0"><code>${escapeHtml(source)}</code></pre>` : ''}
       </div>
       <div class="result-panel">
@@ -455,7 +465,7 @@ function workbench(expanded: boolean): string {
 }
 
 function privacyPage(): string {
-  return `<main id="main" class="prose-page"><p class="eyebrow">Policy note</p><h1>Privacy in plain words</h1><p class="lede">Recipe Import Repair works without an account or a server upload.</p><section><h2>Your recipe files</h2><p>Your browser reads and repairs the text. The site does not send recipe text to us or another service.</p><h2>Browser storage</h2><p>Demo mode stores only its bundled sample in session storage under a <code>demo:</code> key. Starting normal work removes that demo key.</p><h2>Network requests</h2><p>The installed app shell can load from a local browser cache. The repair flow makes no third-party requests.</p><h2>Questions</h2><p>Open an issue in the product repository if this policy needs correction.</p></section></main>`;
+  return `<main id="main" class="prose-page"><p class="eyebrow">Policy note</p><h1>Privacy in plain words</h1><p class="lede">Recipe Import Repair works without an account or a server upload.</p><section><h2>Your recipe files</h2><p>Your browser reads and repairs the text. The site does not send recipe text to us or another service.</p><h2>Browser storage</h2><p>Demo mode stores only its bundled sample in session storage under a <code>demo:</code> key. Starting normal work removes that demo key.</p><h2>Network requests</h2><p>The installed app shell can load from a local browser cache. The repair flow makes no third-party requests.</p><h2>Questions</h2><p><a href="https://github.com/B-Divyesh/sf-recipe-import-repair/issues" target="_blank" rel="noreferrer">Open an issue in the Recipe Import Repair repository <span class="sr-only">(opens in a new tab)</span></a> if this policy needs correction.</p></section></main>`;
 }
 
 function termsPage(): string {
@@ -522,7 +532,7 @@ app.addEventListener('click', (event) => {
   if (action === 'inspect') {
     source = document.querySelector<HTMLTextAreaElement>('#source-text')?.value ?? '';
     parseCurrentSource();
-    render();
+    focusVisibleResult(errorMessage ? '#source-error' : '#workbench-status');
   } else if (action === 'apply-all') applyAllRepairs();
   else if (action === 'undo') undoRepair();
   else if (action === 'export') exportRecipe();
@@ -553,11 +563,17 @@ app.addEventListener('change', async (event) => {
     const file = target.files[0];
     if (file.size > 2 * 1024 * 1024) {
       errorMessage = 'The file is larger than 2 MB. Choose a smaller recipe file.';
-      render(); return;
+      notice = errorMessage;
+      focusVisibleResult('#source-error');
+      return;
     }
     source = await file.text();
-    if (route === 'home' && target.id === 'home-file' && !document.querySelector('.workbench')) return;
-    parseCurrentSource(); render(); return;
+    parseCurrentSource();
+    if (recipe && format) {
+      notice = `${file.name} read as ${format}. ${recipe.title ? `“${recipe.title}”` : 'The recipe'} has ${issues.length} ${issues.length === 1 ? 'issue' : 'issues'}.`;
+    }
+    focusVisibleResult(errorMessage ? '#source-error' : '#workbench-status');
+    return;
   }
   const field = target.dataset.field;
   if (field && recipe) {

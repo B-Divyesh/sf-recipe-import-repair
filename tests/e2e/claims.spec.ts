@@ -306,13 +306,41 @@ test('@claim:offline-reload reloads the demo without a network', async ({ page, 
 });
 
 test('@claim:file-limit rejects recipe files larger than 2 MB', async ({ page }) => {
-  await page.goto('/demo');
-  await page.locator('#demo-file').setInputFiles({
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.locator('#hero-file').setInputFiles({
     name: 'large-recipe.json',
     mimeType: 'application/json',
     buffer: Buffer.alloc(2 * 1024 * 1024 + 1, 'x'),
   });
-  await expect(page.getByRole('alert')).toContainText('larger than 2 MB');
+  const alert = page.getByRole('alert');
+  await expect(alert).toContainText('larger than 2 MB');
+  await expect(alert).toBeFocused();
+  const box = await alert.boundingBox();
+  expect(box!.y).toBeGreaterThanOrEqual(0);
+  expect(box!.y + box!.height).toBeLessThanOrEqual(844);
+});
+
+test('the hero file picker reveals and focuses a successful import on mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.locator('#hero-file').setInputFiles({
+    name: 'cold-visitor-pasta.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify({
+      title: 'Cold visitor pasta',
+      ingredients: ['2 cups pasta'],
+      steps: ['Boil the pasta.'],
+    })),
+  });
+
+  const status = page.locator('#workbench-status');
+  await expect(status).toContainText('cold-visitor-pasta.json read as JSON. “Cold visitor pasta” has 0 issues.');
+  await expect(status).toBeFocused();
+  await expect(page.getByLabel(/Title/)).toHaveValue('Cold visitor pasta');
+  const box = await status.boundingBox();
+  expect(box!.y).toBeGreaterThanOrEqual(0);
+  expect(box!.y + box!.height).toBeLessThanOrEqual(844);
 });
 
 test('@claim:free-flow completes without an account or payment', async ({ page }) => {
@@ -435,6 +463,14 @@ test('every route updates title, description, canonical, and social metadata', a
     await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content', canonical);
     await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute('content', title);
   }
+});
+
+test('the privacy correction instruction links to the product issue tracker', async ({ page }) => {
+  await page.goto('/privacy');
+  const repositoryLink = page.getByRole('link', { name: /Open an issue in the Recipe Import Repair repository/ });
+  await expect(repositoryLink).toHaveAttribute('href', 'https://github.com/B-Divyesh/sf-recipe-import-repair/issues');
+  await expect(repositoryLink).toHaveAttribute('target', '_blank');
+  await expect(repositoryLink).toHaveAttribute('rel', 'noreferrer');
 });
 
 test('the static 404 skip link reaches its main content', async ({ page }) => {

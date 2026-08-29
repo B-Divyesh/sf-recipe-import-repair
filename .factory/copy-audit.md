@@ -53,6 +53,16 @@ The first screen states the job, audience, and first action in one breath at 390
 | Clear recipe and results | 4 | Pass |
 | The JSON has invalid punctuation. | 6 | Pass |
 | Check its commas, quotes, and brackets, then inspect it again. | 10 | Pass |
+| `[file name]` read as JSON. | 5 | Pass — visible first-screen file result |
+| `[recipe title]` has 0 issues. | 5 | Pass — visible first-screen file result |
+| The file is larger than 2 MB. | 7 | Pass — `file-limit` |
+| Choose a smaller recipe file. | 5 | Pass — file error next step |
+
+## Legal pages
+
+| Sentence | Words | Result |
+| --- | ---: | --- |
+| Open an issue in the Recipe Import Repair repository if this policy needs correction. | 14 | Pass — linked to the product issue tracker |
 
 ## README
 
@@ -93,4 +103,4 @@ Operational installation, testing, build, deployment, license, and format-list s
 | Structured audit download | repair details |
 | Isolated sample workspace | demo |
 
-Catalog description: “Repair recipe import files before adding them to your recipe app.” It starts with a verb and has 65 characters.
+Catalog description: “Fix JSON, JSON-LD, and Markdown recipe imports before adding them to your recipe app.” It starts with a verb and has 85 characters.

@@ -60,7 +60,7 @@
     "claim": "Rejects recipe files larger than 2 MB",
     "where": "workbench input note",
     "test": "npm test -- --grep @claim:file-limit",
-    "sandbox": "fresh browser context; choose a generated 2 MB plus one byte fixture and assert the size error"
+    "sandbox": "fresh 390 px browser context; choose a generated 2 MB plus one byte fixture through the first-screen file action; assert the size error is visible, focused, and inside the viewport"
   },
   {
     "id": "free-flow",
