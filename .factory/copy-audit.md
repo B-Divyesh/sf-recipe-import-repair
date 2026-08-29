@@ -1,6 +1,6 @@
 # Landing copy audit
 
-Audit date: 2026-08-28. Counts treat hyphenated terms, URLs, and `$0` as one word. Labels and fragments are included for completeness. No line exceeds 22 words. No line contains a banned marketing word.
+Audit date: 2026-08-29. Counts treat hyphenated terms, URLs, and `$0` as one word. Labels and fragments are included for completeness. No line exceeds 22 words. No line contains a banned marketing word.
 
 ## First screen
 
@@ -47,6 +47,17 @@ The first screen states the job, the audience, and the first action in one breat
 | Repairs do not change cooking instructions. | 6 | Pass |
 | No recipe text leaves your device. | 6 | Pass |
 | No account is required. | 4 | Pass |
+
+## Demo and routes
+
+| Copy | Words | Result |
+| --- | ---: | --- |
+| Demo — sample data, nothing is saved | 7 | Pass |
+| Leaving opens a blank workspace and discards this sample. | 9 | Pass |
+| Repair this sample recipe | 4 | Pass |
+| The sample includes a fraction, a malformed decimal, and a long unit. | 12 | Pass |
+| Page not found | 3 | Pass |
+| The address may be wrong, or the page may have moved. | 11 | Pass |
 
 ## Terminology
 

@@ -1,3 +1,58 @@
+# Polish 1 handoff — PASS
+
+- Work order: `recipe-import-repair-polish-1`
+- Base reviewed: `d0030d6115ea2393b6f645a704f2f54ac68a183f`
+- Repair commits: `11034f70cafe66764e244495da4266ce8df570d0`, `f9c4a87`
+- Deployment: Azure Static Web Apps, deployment ID `6108d179-4d01-4365-a716-10f70d67b2b4`
+- Live URL: <https://recipe-import-repair.sociobot.in/?demo=1>
+- Date: 2026-08-29 UTC
+
+## Completed work
+
+- Closed every finding in `.factory/review-1.md`; the detailed map is in
+  `.factory/polish-1.md`.
+- Added the one-click `?demo=1` sample entry, persistent banner, reset proof,
+  and explicit leave-and-discard wording. `/demo` remains an equivalent route.
+- Rewrote reviewed metaphor/slogan labels in plain task language, including
+  both 404 pages. Added the manifest claim and browser proof for the three
+  sample issues, and extended neutral-export proof for parsed ingredient fields.
+
+## Verification
+
+- Clean clone at `/tmp/recipe-import-repair-clean.GxXacx/repo`: `npm ci`,
+  `npm test`, then all 13 commands in `.factory/claims.json`: PASS.
+- Current tree: `npm test` (8 unit/config and 22 Chromium tests),
+  `npm run typecheck`, `npm run lint`, and `npm run build`: PASS.
+- Local `verify-url.sh` for `/` and `/?demo=1`: PASS; no console errors, one
+  h1, `lang=en`, main landmark, and image alt text.
+- Local and live Playwright Axe checks: zero serious/critical violations on
+  demo, Privacy, and Terms; the full suite also covers home and 404 in both
+  themes. The standalone Axe CLI was attempted but cannot locate a system
+  Chrome in this worker image; Playwright uses the supplied browser.
+- Cold live check proves three sample issues, reset, isolated storage,
+  leave-demo clearing, revised copy, same-origin requests, titles, and HTTP
+  404. Evidence is under `.factory/evidence/polish-1/`.
+- Local and live JavaScript SHA-256 match:
+  `6b3e0b1805a462ec4e20ce3b3a899dbe3c9851e22de9bfe36669e211c3d82ad9`.
+
+## Run and deploy
+
+```sh
+npm ci
+npm test
+npm run build
+/opt/fleet/lib/deploy-static.sh recipe-import-repair ./dist
+```
+
+## Known gaps
+
+None in the product. The standalone Axe CLI needs a system Chrome unavailable
+in this container; equivalent Playwright Axe checks passed.
+
+---
+
+# Historical review and verification handoffs
+
 # Review 1 handoff — FAIL
 
 - Work order: `recipe-import-repair-review-1`
