@@ -4,6 +4,7 @@
 - Reviewed candidate: `2a8eb27b75f9b2a9ca95cddfbef4b8ab06d057ea`
 - Review report: `80ba1eb90c879fa95d45729e654a57b9e80d472e`
 - Product repair commit: `b4b61c4`
+- Final verified repository head: `ba1aae9`
 - Deployment ID: `bd1889fb-8ce1-43eb-9f20-06b13460f836`
 - Live demo: <https://recipe-import-repair.sociobot.in/?demo=1>
 
@@ -30,7 +31,7 @@
 
 ## Verification evidence
 
-- Clean clone: `/tmp/recipe-import-repair-polish2.CktSnF/repo`; `npm ci`, typecheck, lint, full test, and build passed.
+- Final clean clone: `/tmp/recipe-import-repair-final.kfek1C/repo` at `ba1aae9`; `npm ci`, typecheck, lint, full test, and build passed.
 - Every one of the 14 commands in `.factory/claims.json` passed independently in that clone.
 - Local suite: 10 unit/config tests and 28 Chromium tests passed.
 - Live suite: all 27 product/browser tests passed against the custom domain; the added reviewed-wording test also passed live.

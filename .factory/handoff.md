@@ -4,6 +4,7 @@
 - Base review: `80ba1eb90c879fa95d45729e654a57b9e80d472e`
 - Product repair: `b4b61c4`
 - Evidence commit: `da02a6c`
+- Final QA and handoff commit: `ba1aae9`
 - Deployment: Azure Static Web Apps, ID `bd1889fb-8ce1-43eb-9f20-06b13460f836`
 - Live URL: <https://recipe-import-repair.sociobot.in/?demo=1>
 - Date: 2026-08-29 UTC
@@ -20,7 +21,7 @@
 
 ## Verification
 
-- Clean clone `/tmp/recipe-import-repair-polish2.CktSnF/repo`: `npm ci`, `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` passed.
+- Final clean clone `/tmp/recipe-import-repair-final.kfek1C/repo` at `ba1aae9`: `npm ci`, `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` passed.
 - All 14 claim commands in `.factory/claims.json` passed independently in that clone.
 - Final local suite: 10 unit/config tests and 28 Chromium tests passed.
 - Deployed suite: all 27 end-to-end product tests passed against `https://recipe-import-repair.sociobot.in`; the added reviewed-wording regression also passed live.
