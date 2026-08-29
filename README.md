@@ -2,13 +2,13 @@
 
 Recipe Import Repair fixes broken recipe imports before saving them to a recipe keeper. It is for people who move their own recipes between self-hosted apps.
 
-Paste Recipe JSON, JSON-LD, or Markdown. The bench separates each field and points to malformed quantities, verbose units, missing data, invalid source addresses, and oversized fields. Each automatic repair shows the exact change and can be undone. A neutral JSON export preserves the source URL and author.
+Paste Recipe JSON, JSON-LD, or Markdown. The tool separates each field and points to malformed quantities, verbose units, missing data, invalid source addresses, and oversized fields. Each automatic repair shows the exact change and can be undone. A neutral JSON export preserves the source URL and author.
 
 Recipe text stays in the browser. The app works offline after the first visit. The full repair and export flow is free and needs no account.
 
 ## Try the isolated demo
 
-Open `/demo` or [the deployed demo](https://recipe-import-repair.sociobot.in/demo). It loads “Rosemary tomato beans” with three repairable lines. Demo source uses a separate `demo:` session storage key and never enters real storage. Use **Reset demo** for a clean sample.
+Open `?demo=1`, `/demo`, or [the deployed demo](https://recipe-import-repair.sociobot.in/?demo=1). It loads “Rosemary tomato beans” with three repairable issues. Demo source uses a separate `demo:` session storage key and never enters real storage. Use **Reset demo** for a clean sample. **Leave demo and clear sample** discards it and opens a blank workspace.
 
 ## Run locally
 

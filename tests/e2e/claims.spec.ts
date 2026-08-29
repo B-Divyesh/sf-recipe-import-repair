@@ -169,6 +169,20 @@ test('@claim:neutral-export exports repaired JSON with attribution', async ({ pa
     author: 'Mara Vale',
   });
   expect(bundle.recipe.ingredients[0].raw).toBe('1 1/2 cups cooked white beans');
+  expect(bundle.recipe.ingredients[0]).toMatchObject({
+    quantity: '1 1/2',
+    unit: 'cups',
+    item: 'cooked white beans',
+  });
+});
+
+test('@claim:demo-sample-issues opens an isolated three-issue sample from the one-click URL', async ({ page }) => {
+  await page.goto('/?demo=1');
+  await expect(page.getByRole('heading', { level: 1, name: 'Repair this sample recipe' })).toBeVisible();
+  await expect(page.getByLabel('Demo mode')).toContainText('Demo — sample data, nothing is saved');
+  await expect(page.getByLabel(/Title/)).toHaveValue('Rosemary tomato beans');
+  await expect(page.locator('.issue [data-repair], .issue button[data-repair]')).toHaveCount(3);
+  await expect(page.getByRole('link', { name: 'Leave demo and clear sample' })).toBeVisible();
 });
 
 test('@claim:local-only sends no recipe data to another origin', async ({ page }) => {
@@ -190,7 +204,7 @@ test('@claim:demo-isolation keeps sample state out of real storage', async ({ pa
   }));
   expect(demoState.localKeys).toEqual([]);
   expect(demoState.sessionKeys).toEqual(['demo:recipe-import-repair:source']);
-  await page.getByRole('link', { name: 'Start for real' }).click();
+  await page.getByRole('link', { name: 'Leave demo and clear sample' }).click();
   expect(await page.evaluate(() => Object.keys(sessionStorage))).toEqual([]);
   await expect(page.getByLabel('Paste JSON, JSON-LD, or Markdown')).toHaveValue('');
 });

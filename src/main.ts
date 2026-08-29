@@ -65,6 +65,7 @@ function escapeHtml(value: string): string {
 
 function getRoute(): Route {
   const path = window.location.pathname.replace(/\/+$/, '') || '/';
+  if (path === '/' && new URLSearchParams(window.location.search).get('demo') === '1') return 'demo';
   if (path === '/') return 'home';
   if (path === '/demo') return 'demo';
   if (path === '/privacy') return 'privacy';
@@ -92,7 +93,7 @@ function updateMeta(): void {
 }
 
 function navigate(path: string): void {
-  if (window.location.pathname === path) return;
+  if (`${window.location.pathname}${window.location.search}` === path) return;
   window.history.pushState({}, '', path);
   changeRoute();
 }
@@ -250,7 +251,7 @@ function exportRecipe(): void {
 function header(): string {
   return `<a class="skip-link" href="#main">Skip to main content</a>
     ${isOffline ? '<div class="offline-strip" role="status">Offline — file repair still works</div>' : ''}
-    ${isDemo ? `<aside class="demo-strip" aria-label="Demo mode"><strong>Demo — sample data, nothing is saved</strong><span><button class="text-button" data-action="reset-demo">Reset demo</button><a href="/" data-nav>Start for real</a></span></aside>` : ''}
+    ${isDemo ? `<aside class="demo-strip" aria-label="Demo mode"><strong>Demo — sample data, nothing is saved</strong><span><button class="text-button" data-action="reset-demo">Reset demo</button><a href="/" data-nav>Leave demo and clear sample</a></span><small>Leaving opens a blank workspace and discards this sample.</small></aside>` : ''}
     <header class="site-header">
       <a class="wordmark" href="/" data-nav aria-label="Recipe Import Repair home"><span aria-hidden="true">✓</span> Recipe Import Repair</a>
       <nav aria-label="Main navigation">
@@ -282,11 +283,11 @@ function homePage(): string {
     <section class="hero" aria-labelledby="home-title">
       <div class="margin-note" aria-hidden="true">FIELD NOTE 01<br>CHECK BEFORE IMPORT</div>
       <div class="hero-copy">
-        <p class="eyebrow">A local repair bench for recipe files</p>
+        <p class="eyebrow">Repair recipe files in your browser</p>
         <h1 id="home-title">Fix broken recipe imports before saving</h1>
         <p class="lede">For self-hosted recipe keepers who need clear fixes before an import changes their collection.</p>
         <div class="hero-actions">
-          <a class="button primary" href="/demo" data-nav>Try it with sample data</a>
+          <a class="button primary" href="/?demo=1" data-nav>Try it with sample data</a>
           <label class="button secondary file-picker">Choose your file<input id="hero-file" class="file-input" type="file" accept=".json,.jsonld,.md,.markdown,text/markdown,application/json" /></label>
         </div>
         <p class="action-note">The sample opens with three repairable issues.</p>
@@ -294,23 +295,23 @@ function homePage(): string {
       </div>
       <figure class="hero-art">
         <img src="/assets/repair-workbench.webp" width="960" height="640" alt="An illustrated graph-paper notebook with recipe lines and red correction marks." fetchpriority="high" decoding="async" />
-        <figcaption>Inspect the lines. Apply named changes. Keep the source.</figcaption>
+        <figcaption>Inspect recipe fields. Review each repair. Preserve source attribution.</figcaption>
       </figure>
     </section>
     <section class="preview-section" aria-labelledby="preview-title">
-      <div class="section-intro"><p class="eyebrow">Live workbench</p><h2 id="preview-title">Bring one recipe file</h2><p>Paste JSON, JSON-LD, or Markdown. You see the parsed fields before you export anything.</p></div>
+      <div class="section-intro"><p class="eyebrow">Recipe file preview</p><h2 id="preview-title">Inspect a recipe file</h2><p>Paste JSON, JSON-LD, or Markdown. You see the parsed fields before you export anything.</p></div>
       ${workbench(false)}
     </section>
     <section id="how-it-works" class="method" aria-labelledby="method-title">
-      <div class="section-intro"><p class="eyebrow">Method</p><h2 id="method-title">Repair in three checked steps</h2></div>
+      <div class="section-intro"><p class="eyebrow">How recipe repair works</p><h2 id="method-title">Repair in three checked steps</h2></div>
       <ol class="method-list">
-        <li><span>01</span><div><h3>Read the file</h3><p>The bench separates title, source, ingredients, and steps.</p></div></li>
+        <li><span>01</span><div><h3>Read the file</h3><p>The tool separates title, source, ingredients, and steps.</p></div></li>
         <li><span>02</span><div><h3>Review each mark</h3><p>Every suggested repair shows its exact before and after value.</p></div></li>
         <li><span>03</span><div><h3>Export a neutral file</h3><p>The export keeps attribution and uses a documented JSON shape.</p></div></li>
       </ol>
     </section>
     <section class="boundaries" aria-labelledby="boundaries-title">
-      <div><p class="eyebrow">Bench limits</p><h2 id="boundaries-title">Your recipe stays yours</h2></div>
+      <div><p class="eyebrow">Privacy and limits</p><h2 id="boundaries-title">What stays in your browser</h2></div>
       <div><p>The tool does not fetch recipe pages. Repairs do not change cooking instructions.</p><p>No recipe text leaves your device. No account is required.</p></div>
     </section>
   </main>`;
@@ -318,7 +319,7 @@ function homePage(): string {
 
 function demoPage(): string {
   return `<main id="main" class="demo-main">
-    <section class="demo-heading"><p class="eyebrow">Sample bench</p><h1>Repair this sample recipe</h1><p>The sample includes a fraction, a malformed decimal, and a long unit.</p></section>
+    <section class="demo-heading"><p class="eyebrow">Sample recipe file</p><h1>Repair this sample recipe</h1><p>The sample includes a fraction, a malformed decimal, and a long unit.</p></section>
     ${workbench(true)}
   </main>`;
 }
@@ -409,7 +410,7 @@ function termsPage(): string {
 }
 
 function notFoundPage(): string {
-  return `<main id="main" class="not-found"><div class="red-mark" aria-hidden="true">404</div><p class="eyebrow">Margin note</p><h1>This page is not in the notebook</h1><p>The address may be wrong, or the page may have moved.</p><a class="button primary" href="/" data-nav>Return to the repair bench</a></main>`;
+  return `<main id="main" class="not-found"><div class="red-mark" aria-hidden="true">404</div><p class="eyebrow">Page status</p><h1>Page not found</h1><p>The address may be wrong, or the page may have moved.</p><a class="button primary" href="/" data-nav>Return to recipe repair</a></main>`;
 }
 
 function render(): void {
@@ -452,7 +453,7 @@ app.addEventListener('click', (event) => {
   const nav = target.closest<HTMLAnchorElement>('a[data-nav]');
   if (nav && nav.origin === window.location.origin) {
     event.preventDefault();
-    navigate(nav.pathname);
+    navigate(`${nav.pathname}${nav.search}`);
     return;
   }
   const repairButton = target.closest<HTMLButtonElement>('[data-repair]');

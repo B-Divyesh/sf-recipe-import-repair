@@ -6,7 +6,7 @@ Audit date: 2026-08-28. Counts treat hyphenated terms, URLs, and `$0` as one wor
 
 | Copy | Words | Result |
 | --- | ---: | --- |
-| A local repair bench for recipe files | 7 | Pass |
+| Repair recipe files in your browser | 6 | Pass |
 | Fix broken recipe imports before saving | 6 | Pass |
 | For self-hosted recipe keepers who need clear fixes before an import changes their collection. | 14 | Pass |
 | Try it with sample data | 6 | Pass |
@@ -15,9 +15,9 @@ Audit date: 2026-08-28. Counts treat hyphenated terms, URLs, and `$0` as one wor
 | Files stay in this browser | 5 | Pass |
 | Works offline after first visit | 5 | Pass |
 | $0 Free — no account needed | 5 | Pass |
-| Inspect the lines. | 3 | Pass |
-| Apply named changes. | 3 | Pass |
-| Keep the source. | 3 | Pass |
+| Inspect recipe fields. | 3 | Pass |
+| Review each repair. | 3 | Pass |
+| Preserve source attribution. | 3 | Pass |
 
 The first screen states the job, the audience, and the first action in one breath.
 
@@ -25,7 +25,7 @@ The first screen states the job, the audience, and the first action in one breat
 
 | Copy | Words | Result |
 | --- | ---: | --- |
-| Bring one recipe file | 4 | Pass |
+| Inspect a recipe file | 4 | Pass |
 | Paste JSON, JSON-LD, or Markdown. | 5 | Pass |
 | You see the parsed fields before you export anything. | 9 | Pass |
 | Maximum file size: 2 MB. | 5 | Pass |
@@ -34,7 +34,7 @@ The first screen states the job, the audience, and the first action in one breat
 | Paste recipe text or choose a file. | 7 | Pass |
 | Then inspect it. | 3 | Pass |
 | Repair in three checked steps | 5 | Pass |
-| The bench separates title, source, ingredients, and steps. | 8 | Pass |
+| The tool separates title, source, ingredients, and steps. | 8 | Pass |
 | Every suggested repair shows its exact before and after value. | 10 | Pass |
 | The export keeps attribution and uses a documented JSON shape. | 10 | Pass |
 
@@ -42,7 +42,7 @@ The first screen states the job, the audience, and the first action in one breat
 
 | Copy | Words | Result |
 | --- | ---: | --- |
-| Your recipe stays yours | 4 | Pass |
+| What stays in your browser | 5 | Pass |
 | The tool does not fetch recipe pages. | 7 | Pass |
 | Repairs do not change cooking instructions. | 6 | Pass |
 | No recipe text leaves your device. | 6 | Pass |

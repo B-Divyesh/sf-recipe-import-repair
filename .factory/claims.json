@@ -15,10 +15,17 @@
   },
   {
     "id": "neutral-export",
-    "claim": "Exports neutral JSON and preserves source attribution",
+    "claim": "Exports neutral JSON with source attribution and parsed ingredient fields",
     "where": "landing method, export toolbar, README",
     "test": "npm test -- --grep @claim:neutral-export",
-    "sandbox": "demo data; apply all safe repairs, download JSON, and assert schema, repaired ingredient, source URL, and author"
+    "sandbox": "demo data; apply all safe repairs, download JSON, and assert schema, repaired ingredient text, quantity, unit, item, source URL, and author"
+  },
+  {
+    "id": "demo-sample-issues",
+    "claim": "The sample opens Rosemary tomato beans with three repairable issues",
+    "where": "landing action note, README, demo page",
+    "test": "npm test -- --grep @claim:demo-sample-issues",
+    "sandbox": "fresh browser context; open ?demo=1 and assert the sample title, persistent demo banner, and exactly three repairable issues"
   },
   {
     "id": "local-only",
