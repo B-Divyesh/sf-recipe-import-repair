@@ -352,8 +352,10 @@ function homePage(): string {
 }
 
 function demoPage(): string {
+  const compactDemo = window.matchMedia('(max-width: 680px)').matches;
   return `<main id="main" class="demo-main">
     <section class="demo-heading"><p class="eyebrow">Sample recipe file</p><h1>Repair Rosemary tomato beans</h1><p>Review three suggested repairs before you export this sample.</p></section>
+    ${compactDemo ? demoQuickStart() : ''}
     ${workbench(true)}
   </main>`;
 }
@@ -379,6 +381,17 @@ function demoIssuePreview(): string {
   const firstIssue = issues[0];
   if (!firstIssue) return '';
   return `<p class="demo-issue-preview"><strong>First issue:</strong> ${escapeHtml(firstIssue.message)}</p>`;
+}
+
+function demoQuickStart(): string {
+  if (!recipe) return '';
+  const availableRepairs = issues.filter((item) => item.repair).length;
+  return `<section class="demo-quick-start" aria-label="Sample recipe status">
+    <label class="field full"><span>Sample title ${fieldStatus('title')}</span><input id="demo-title" data-field="title" value="${escapeHtml(recipe.title)}" /></label>
+    ${issueSummary()}
+    ${demoIssuePreview()}
+    <button class="button proof-button" data-action="apply-all" ${availableRepairs ? '' : 'disabled'}>Apply ${availableRepairs} suggested ${availableRepairs === 1 ? 'repair' : 'repairs'}</button>
+  </section>`;
 }
 
 function fieldStatus(field: string): string {
@@ -435,7 +448,7 @@ function workbench(expanded: boolean): string {
       </div>
       <div class="result-panel">
         <div class="panel-heading result-heading"><div><p class="step-label">Inspection</p><${panelHeading}>Parsed recipe</${panelHeading}></div>${recipe ? issueSummary() : ''}</div>
-        ${recipe ? `${expanded ? `<label class="field full demo-title-field"><span>Sample title ${fieldStatus('title')}</span><input id="demo-title" data-field="title" value="${escapeHtml(recipe.title)}" /></label>${demoIssuePreview()}` : ''}<div class="issue-actions"><button class="button proof-button" data-action="apply-all" ${availableRepairs ? '' : 'disabled'}>Apply ${availableRepairs} suggested ${availableRepairs === 1 ? 'repair' : 'repairs'}</button><button class="button secondary" data-action="undo" ${editHistory.length ? '' : 'disabled'}>Undo last change</button></div>${issueList()}${editor(!expanded)}<div class="export-strip"><div class="export-copy"><strong>Download repaired recipe</strong><label for="export-format">Export format</label><select id="export-format" data-export-format><option value="jsonld"${exportFormat === 'jsonld' ? ' selected' : ''}>Recipe JSON-LD (.json)</option><option value="original"${exportFormat === 'original' ? ' selected' : ''}>Repaired original format (${format})</option><option value="details"${exportFormat === 'details' ? ' selected' : ''}>Repair details (.json)</option></select><span>Recipe JSON-LD uses Schema.org Recipe fields. Repaired original keeps this file's ${format} format.</span>${canExport(recipe) ? '' : '<span>Fix blocking issues before export.</span>'}</div><button class="button export-button" data-action="export" ${canExport(recipe) ? '' : 'disabled'}>Download selected file</button></div>${repairLog.length ? `<details class="repair-log"><summary>Repair log (${repairLog.length})</summary><ol>${repairLog.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ol></details>` : ''}` : `<div class="empty-sheet"><span aria-hidden="true">↳</span><h3>Your parsed fields will appear here</h3><p>Paste recipe text or choose a file. Then inspect it.</p></div>`}
+        ${recipe ? `<div class="issue-actions"><button class="button proof-button${expanded ? ' detail-apply' : ''}" data-action="apply-all" ${availableRepairs ? '' : 'disabled'}>Apply ${availableRepairs} suggested ${availableRepairs === 1 ? 'repair' : 'repairs'}</button><button class="button secondary" data-action="undo" ${editHistory.length ? '' : 'disabled'}>Undo last change</button></div>${issueList()}${editor()}<div class="export-strip"><div class="export-copy"><strong>Download repaired recipe</strong><label for="export-format">Export format</label><select id="export-format" data-export-format><option value="jsonld"${exportFormat === 'jsonld' ? ' selected' : ''}>Recipe JSON-LD (.json)</option><option value="original"${exportFormat === 'original' ? ' selected' : ''}>Repaired original format (${format})</option><option value="details"${exportFormat === 'details' ? ' selected' : ''}>Repair details (.json)</option></select><span>Recipe JSON-LD uses Schema.org Recipe fields. Repaired original keeps this file's ${format} format.</span>${canExport(recipe) ? '' : '<span>Fix blocking issues before export.</span>'}</div><button class="button export-button" data-action="export" ${canExport(recipe) ? '' : 'disabled'}>Download selected file</button></div>${repairLog.length ? `<details class="repair-log"><summary>Repair log (${repairLog.length})</summary><ol>${repairLog.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ol></details>` : ''}` : `<div class="empty-sheet"><span aria-hidden="true">↳</span><h3>Your parsed fields will appear here</h3><p>Paste recipe text or choose a file. Then inspect it.</p></div>`}
       </div>
     </div>
   </section>`;
@@ -560,6 +573,7 @@ app.addEventListener('change', async (event) => {
 window.addEventListener('popstate', () => changeRoute('pop'));
 window.addEventListener('online', () => { isOffline = false; render(); });
 window.addEventListener('offline', () => { isOffline = true; render(); });
+window.matchMedia('(max-width: 680px)').addEventListener('change', () => { if (route === 'demo') render(); });
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/service-worker.js').catch(() => undefined));

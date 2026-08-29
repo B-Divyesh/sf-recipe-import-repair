@@ -175,8 +175,8 @@ summary { display: inline-flex; min-height: 44px; align-items: center; color: va
 .demo-main { max-width: 1440px; margin: 0 auto; padding: 64px clamp(16px, 5vw, 80px); }
 .demo-heading { margin-bottom: 36px; }
 .demo-heading h1 { margin-bottom: 16px; font-size: clamp(2.4rem, 5vw, 4.8rem); }
-.demo-title-field { margin: 0 0 14px; }
 .demo-issue-preview { display: none; }
+.demo-quick-start { display: none; }
 .prose-page { width: min(850px, calc(100% - 32px)); min-height: 65vh; margin: 0 auto; padding: 72px 0 96px; }
 .prose-page h1 { font-size: clamp(2.5rem, 6vw, 4.8rem); }
 .prose-page section { max-width: 68ch; margin-top: 48px; padding-left: 24px; border-left: 3px solid var(--proof); }
@@ -218,19 +218,10 @@ summary { display: inline-flex; min-height: 44px; align-items: center; color: va
   .demo-heading { margin-bottom: 18px; }
   .demo-heading h1 { margin-bottom: 8px; font-size: clamp(2.05rem, 10.5vw, 2.7rem); }
   .demo-heading > p:last-child { margin-bottom: 0; font-size: 0.88rem; }
-  .workbench.expanded .bench-toolbar { align-items: center; flex-direction: row; gap: 8px; min-height: 48px; padding: 6px 12px; }
-  .workbench.expanded .toolbar-actions { margin-left: auto; }
-  .workbench.expanded .toolbar-actions [data-action="toggle-source"] { display: none; }
-  .workbench.expanded .toolbar-actions .text-button { min-height: 36px; font-size: 0.78rem; }
-  .workbench.expanded .result-panel { order: -1; }
-  .workbench.expanded .result-heading { gap: 8px; margin-bottom: 10px; }
-  .workbench.expanded .result-heading .step-label { margin-bottom: 2px; }
-  .workbench.expanded .status-summary { min-width: 0; padding: 5px 8px; font-size: 0.7rem; }
-  .workbench.expanded .demo-title-field { margin-bottom: 10px; }
-  .workbench.expanded .demo-issue-preview { display: block; margin: 0 0 10px; padding: 7px 9px; border-left: 4px solid var(--amber); background: var(--amber-soft); font-size: 0.77rem; line-height: 1.35; }
-  .workbench.expanded .issue-actions { gap: 8px; padding-bottom: 12px; }
-  .workbench.expanded .issue-actions .button { min-height: 44px; }
-  .workbench.expanded .issue-list { margin: 12px 0 24px; }
+  .demo-quick-start { display: grid; gap: 10px; margin-bottom: 16px; padding: 14px; border: 2px solid var(--ink); background: var(--paper-raised); box-shadow: 5px 5px 0 var(--shadow); }
+  .demo-quick-start .status-summary { min-width: 0; padding: 5px 8px; font-size: 0.7rem; }
+  .demo-quick-start .demo-issue-preview { display: block; margin: 0; padding: 7px 9px; border-left: 4px solid var(--amber); background: var(--amber-soft); font-size: 0.77rem; line-height: 1.35; }
+  .workbench.expanded .detail-apply { display: none; }
   .bench-toolbar, .panel-heading, .result-heading, .export-strip { align-items: stretch; flex-direction: column; }
   .toolbar-actions { justify-content: space-between; }
   .source-panel, .result-panel { padding: 18px 14px; }

@@ -256,7 +256,7 @@ test('@claim:demo-sample-issues opens an isolated three-issue sample from the on
   expect(await viewportBottom('h1')).toBeLessThanOrEqual(844);
   expect(await viewportBottom('#demo-title')).toBeLessThanOrEqual(844);
   expect(await viewportBottom('.demo-issue-preview')).toBeLessThanOrEqual(844);
-  expect(await viewportBottom('[data-action="apply-all"]')).toBeLessThanOrEqual(844);
+  expect(await viewportBottom('.demo-quick-start [data-action="apply-all"]')).toBeLessThanOrEqual(844);
   await page.getByLabel('Sample title').fill('Rosemary tomato beans, edited');
   await page.getByLabel('Sample title').press('Tab');
   await expect(page.getByLabel('Sample title')).toHaveValue('Rosemary tomato beans, edited');
