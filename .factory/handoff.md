@@ -2,8 +2,8 @@
 
 - Work order: `recipe-import-repair-polish-1`
 - Base reviewed: `d0030d6115ea2393b6f645a704f2f54ac68a183f`
-- Repair commits: `11034f70cafe66764e244495da4266ce8df570d0`, `f9c4a87`
-- Deployment: Azure Static Web Apps, deployment ID `6108d179-4d01-4365-a716-10f70d67b2b4`
+- Repair commits: `11034f70cafe66764e244495da4266ce8df570d0`, `f9c4a87`, `49a10bd`
+- Deployment: Azure Static Web Apps, deployment ID `a58bb19f-6e22-439b-9ccc-ad341ed621ff`
 - Live URL: <https://recipe-import-repair.sociobot.in/?demo=1>
 - Date: 2026-08-29 UTC
 
@@ -31,7 +31,9 @@
   Chrome in this worker image; Playwright uses the supplied browser.
 - Cold live check proves three sample issues, reset, isolated storage,
   leave-demo clearing, revised copy, same-origin requests, titles, and HTTP
-  404. Evidence is under `.factory/evidence/polish-1/`.
+ 404. A final post-deploy cold check also confirms the task label and absence
+ of the remaining “FIELD NOTE” and “Review each mark” wording. Evidence is
+ under `.factory/evidence/polish-1/`.
 - Local and live JavaScript SHA-256 match:
   `6b3e0b1805a462ec4e20ce3b3a899dbe3c9851e22de9bfe36669e211c3d82ad9`.
 

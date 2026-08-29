@@ -2,7 +2,7 @@
 
 - Work order: `recipe-import-repair-polish-1`
 - Reviewed report: `d0030d6115ea2393b6f645a704f2f54ac68a183f`
-- Repair commits: `11034f70cafe66764e244495da4266ce8df570d0`, `f9c4a87`
+- Repair commits: `11034f70cafe66764e244495da4266ce8df570d0`, `f9c4a87`, `49a10bd`
 - Live check: <https://recipe-import-repair.sociobot.in/?demo=1>
 - Evidence directory: `.factory/evidence/polish-1/`
 
@@ -21,3 +21,5 @@ same-origin requests, zero primary-route console errors, zero serious/critical
 Playwright Axe violations, and an HTTP 404 with “Page not found.” The live app
 bundle SHA-256 equals the local build:
 `6b3e0b1805a462ec4e20ce3b3a899dbe3c9851e22de9bfe36669e211c3d82ad9`.
+The final deployment also removes the remaining visible “FIELD NOTE” and
+“Review each mark” phrases while retaining the product’s notebook visual system.
