@@ -1,42 +1,23 @@
-# Polish 4 handoff — PASS
+# Review 5 handoff — PASS
 
-- Work order: `recipe-import-repair-polish-4`
-- Reviewed candidate: `c3fb608cc69239e00d33b593fc397da740234faf`
-- Adversarial review: `b799d2749665ddfe55ebc2ff46e3e6edd9b897b6`
-- Product repair commit: `451202e`
-- Deployment ID: `8f771e6b-7543-4d14-999a-44cbc1dcd10b`
+- Work order: `recipe-import-repair-review-5`
+- Reviewed commit: `6d3dbaebb99b998c946e09ff6abdc5d5375ed59d`
 - Live URL: <https://recipe-import-repair.sociobot.in>
+- Review report: `.factory/review-5.md`
 - Date: 2026-08-29 UTC
 
-## What changed
+## What was done
 
-- Fixed the first-screen **Choose your file** path. Successful imports now reveal and focus a visible status containing the filename, parsed format, recipe title, and issue count.
-- Invalid and oversized first-screen files now reveal and focus the visible source alert. Both status types are scrolled into the current viewport on phone and desktop.
-- Removed the obsolete `home-file` condition that caused the reviewed silent result.
-- Added regressions for valid and oversized hero-file selection at 390 × 844, including focus and viewport bounds.
-- Linked the Privacy correction instruction directly to the product issue tracker with accessible external-link wording.
-- Kept all earlier copy, demo isolation, export, routing, metadata, 404, mobile, accessibility, privacy, and offline repairs covered.
-- Updated `.factory/claims.json`, `.factory/copy-audit.md`, `.factory/catalog-description.txt`, and `.factory/polish-4.md`.
+- Completed a fresh adversarial review at 390 × 844 and 1440 × 900 without changing product code.
+- Re-audited every landing-page and README sentence, heading, label, and action.
+- Exercised the one-click demo, Reset, exit, offline reload, storage separation, same-origin request behavior, and the real file path.
+- Ran every claim command independently from a clean clone and checked all prior review findings in source and on the live site.
+- Crawled routes and links; checked metadata, the HTTP 404, route history/focus, accessibility, security headers, and visual identity.
+- Recorded a zero-finding **PASS** in `.factory/review-5.md`.
 
-## Verification evidence
+## Verification
 
-- Clean clone: `/tmp/recipe-import-repair-polish4.pR6oYr/repo` at `451202e`.
-- Install: `npm ci` passed with zero vulnerabilities.
-- Static gates: `npm run typecheck`, `npm run lint`, and `npm run build` passed.
-- Full clean suite: 10 unit/config tests and 30 Chromium tests passed.
-- Claims: all 14 exact `.factory/claims.json` commands passed independently.
-- Accessibility: Playwright Axe found zero violations on Home, Demo, Privacy, Terms, and 404 in light mode, and all application routes in dark mode.
-- URL verifier: all four primary routes passed locally and live with no console or page errors; reports and screenshots are under `.factory/evidence/polish-4/{local,live}/verify-*`.
-- Cold live file flow: success status was focused and inside both 390 × 844 and 1440 × 900 viewports; the 2 MB error was focused inside 390 × 844. Screenshots are `live/hero-file-mobile.png`, `live/hero-file-desktop.png`, and `live/hero-file-error-mobile.png`.
-- Cold live demo: the sample name, isolated banner, and repair action fit in the initial 390 × 844 viewport; only `demo:recipe-import-repair:source` existed in session storage and local storage was empty. Screenshot: `live/demo-cold-mobile.png`.
-- Live browser suite: all 30 tests passed against <https://recipe-import-repair.sociobot.in>.
-- Live routing: `/`, `/demo`, `/privacy`, and `/terms` returned 200; `/polish-4-not-found` returned the designed 404; public assets and both external links returned 200.
-- Headers: same-origin CSP with `frame-ancestors` in the response, HSTS, `nosniff`, referrer policy, and permissions policy are present.
-- Lighthouse mobile: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 0.9 s, LCP 1.0 s, TBT 60 ms, CLS 0. Report: `.factory/evidence/polish-4/live/lighthouse-demo-mobile.json`.
-- Build size: JavaScript 35.29 kB raw / 12.09 kB gzip; CSS 18.14 kB raw / 4.79 kB gzip.
-- Deployment identity: local and live JavaScript SHA-256 are both `f40fefe3b96c3ffdc9926cfb1ea090b075acb92c601e3ed5cd286868a275cade`.
-
-## Run and verify
+Clean clone: `/tmp/recipe-import-repair-review5.ZW8WeH/repo` at `6d3dbae`.
 
 ```sh
 npm ci
@@ -47,8 +28,14 @@ npm run build
 PLAYWRIGHT_BASE_URL=https://recipe-import-repair.sociobot.in npm run test:e2e
 ```
 
-Run each command in `.factory/claims.json` independently for claim verification. Deploy `./dist` as the static artifact.
+- All 14 exact commands in `.factory/claims.json` passed independently.
+- Full clean suite: 10 unit/config tests and 30 Chromium tests passed.
+- Live suite: all 30 Chromium tests passed, including Axe, offline, storage, routing, focus, mobile, and console checks.
+- `verify-url.sh` passed Home, Demo, Privacy, and Terms with no console/page errors.
+- The live crawl found no dead link; the designed unknown route returned HTTP 404.
+- Build produced `dist/index.html`; JavaScript is 35.29 kB raw / 12.09 kB gzip.
+- Clean-build and live JavaScript SHA-256: `f40fefe3b96c3ffdc9926cfb1ea090b075acb92c601e3ed5cd286868a275cade`.
 
 ## Known gaps and next steps
 
-None. Every finding from adversarial reviews 1–4 is closed, and no severity is deferred.
+None. Review 5 has zero findings, and all findings from reviews 1–4 remain fixed.
