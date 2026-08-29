@@ -1,3 +1,25 @@
+# Review 1 handoff — FAIL
+
+- Work order: `recipe-import-repair-review-1`
+- Date: 2026-08-29 UTC
+- Scope: independent live review only; no product-code changes were made.
+- Result: **FAIL** with four minor documentation/copy/claims findings in
+  `.factory/review-1.md` (`F-1-1` through `F-1-4`).
+
+Verified: fresh 390 px and desktop live contexts; one-click `/demo`, reset,
+and leave-demo isolation; request logging; controlled offline demo reload;
+routing, titles, link responses, 404, and route focus/back navigation. All 12
+claim commands passed from a fresh local clone. The full 21-browser-test suite
+and production build passed locally. The live JavaScript hash matches the
+fresh local build.
+
+Known gaps: replace metaphor/slogan copy and ambiguous demo-exit label; list
+and test the quantified three-issue sample promise; test/list parsed export
+quantity, unit, and item fields. See `.factory/review-1.md` for exact quotes
+and fixes.
+
+---
+
 # Recipe Import Repair verification handoff — PASS
 
 - Work order: `recipe-import-repair-verify-5`
